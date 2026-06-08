@@ -1,0 +1,27 @@
+# macos
+.DS_Store
+*.swp
+
+# swiftpm
+.build/
+.swiftpm/
+Package.resolved
+
+# xcode
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# локальные файлы codex
+.codex/
+
+# результат сборки
+dist/
+
+# сгенерированные иконки
+Assets/TraceAnime.icns
+Assets/TraceAnime.iconset/
+
+# локальные секреты
+.env
+.env.*
