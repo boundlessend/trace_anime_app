@@ -132,7 +132,9 @@ struct MenuBarRootView: View {
                     HistoryView(
                         history: history,
                         language: settings.language,
-                        openHistory: openHistory(_:)
+                        openHistory: openHistory(_:),
+                        deleteHistory: deleteHistory(_:),
+                        clearHistory: clearHistory
                     )
                     .transition(.opacity.combined(with: .move(edge: .leading)))
                 case .favorites:
@@ -314,6 +316,14 @@ struct MenuBarRootView: View {
         withAnimation(.easeInOut(duration: 0.18)) {
             selectedTab = .search
         }
+    }
+
+    private func deleteHistory(_ entry: SearchHistoryEntry) {
+        history = history.filter { $0.id != entry.id }
+    }
+
+    private func clearHistory() {
+        history = []
     }
 
     private func toggleFavorite(_ result: TraceMoeResult) {

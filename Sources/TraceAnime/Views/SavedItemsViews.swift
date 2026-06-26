@@ -5,11 +5,31 @@ struct HistoryView: View {
     let history: [SearchHistoryEntry]
     let language: AppLanguage
     let openHistory: (SearchHistoryEntry) -> Void
+    let deleteHistory: (SearchHistoryEntry) -> Void
+    let clearHistory: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(t(.history, language: language))
-                .font(.headline)
+            HStack {
+                Text(t(.history, language: language))
+                    .font(.headline)
+
+                Spacer()
+
+                if !history.isEmpty {
+                    TooltipIconButton(
+                        text: t(.clearHistory, language: language),
+                        systemImage: "trash",
+                        fontSize: 15
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            clearHistory()
+                        }
+                    }
+                    .frame(width: 30, height: 26)
+                    .liquidGlass(cornerRadius: 13, isActive: false)
+                }
+            }
 
             if history.isEmpty {
                 Text(t(.noHistory, language: language))
@@ -39,6 +59,18 @@ struct HistoryView: View {
                                     openHistory(entry)
                                 }
                                 .buttonStyle(TracePressButtonStyle())
+
+                                TooltipIconButton(
+                                    text: t(.deleteEntry, language: language),
+                                    systemImage: "xmark",
+                                    fontSize: 13
+                                ) {
+                                    withAnimation(.easeInOut(duration: 0.18)) {
+                                        deleteHistory(entry)
+                                    }
+                                }
+                                .frame(width: 26, height: 26)
+                                .liquidGlass(cornerRadius: 13, isActive: false)
                             }
                             .padding(10)
                             .liquidGlass(cornerRadius: 12, isActive: false)
