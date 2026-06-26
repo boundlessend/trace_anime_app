@@ -1,14 +1,18 @@
 import AppKit
+import Carbon.HIToolbox
 import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private let popover: NSPopover = NSPopover()
+    private let screenCaptureService: ScreenCaptureService = ScreenCaptureService()
+    private var hotKeyService: HotKeyService?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApplication.shared.setActivationPolicy(.accessory)
         configurePopover()
         configureStatusItem()
+        configureHotKey()
     }
 
     private func configurePopover() {
@@ -46,9 +50,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
+        showPopover()
+    }
+
+    private func showPopover() {
+        guard let button: NSStatusBarButton = statusItem?.button else {
+            return
+        }
+
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         popover.contentViewController?.view.window?.level = .normal
         popover.contentViewController?.view.window?.makeKey()
+    }
+
+    private func configureHotKey() {
+        let service: HotKeyService = HotKeyService { [weak self] in
+            self?.handleCaptureHotKey()
+        }
+        service.register(keyCode: UInt32(kVK_ANSI_S), modifiers: UInt32(optionKey | cmdKey))
+        hotKeyService = service
+    }
+
+    private func handleCaptureHotKey() {
+        Task { @MainActor in
+            let captured: Bool = await screenCaptureService.captureSelectionToClipboard()
+            guard captured else {
+                return
+            }
+
+            NSApplication.shared.activate(ignoringOtherApps: true)
+            showPopover()
+            NotificationCenter.default.post(name: .runClipboardSearch, object: nil)
+        }
     }
 
     private func resizePopover(contentSize: CGSize) {

@@ -45,110 +45,117 @@ struct MenuBarRootView: View {
         self.libraryStorage = LibraryStorage(userDefaults: .standard, encoder: JSONEncoder(), decoder: JSONDecoder())
     }
 
-    var body: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 8) {
-                TooltipIconButton(
-                    text: t(.history, language: settings.language),
-                    systemImage: selectedTab == .history ? "arrow.left.circle" : "clock.arrow.circlepath",
-                    fontSize: 17
-                ) {
-                    toggleLibraryTab(.history)
-                }
-                .frame(width: 26, height: 26)
-                .liquidGlass(cornerRadius: 20, isActive: selectedTab == .history)
-                .clipShape(Circle())
+    private var headerBar: some View {
+        HStack(spacing: 8) {
+            TooltipIconButton(
+                text: t(.history, language: settings.language),
+                systemImage: selectedTab == .history ? "arrow.left.circle" : "clock.arrow.circlepath",
+                fontSize: 17
+            ) {
+                toggleLibraryTab(.history)
+            }
+            .frame(width: 26, height: 26)
+            .liquidGlass(cornerRadius: 20, isActive: selectedTab == .history)
+            .clipShape(Circle())
 
-                TooltipIconButton(
-                    text: t(.favorites, language: settings.language),
-                    systemImage: selectedTab == .favorites ? "arrow.left.circle" : "star.circle",
-                    fontSize: 17
-                ) {
-                    toggleLibraryTab(.favorites)
-                }
-                .frame(width: 26, height: 26)
-                .liquidGlass(cornerRadius: 20, isActive: selectedTab == .favorites)
-                .clipShape(Circle())
+            TooltipIconButton(
+                text: t(.favorites, language: settings.language),
+                systemImage: selectedTab == .favorites ? "arrow.left.circle" : "star.circle",
+                fontSize: 17
+            ) {
+                toggleLibraryTab(.favorites)
+            }
+            .frame(width: 26, height: 26)
+            .liquidGlass(cornerRadius: 20, isActive: selectedTab == .favorites)
+            .clipShape(Circle())
 
-                StaticGlassTabControl(
-                    selection: mainTabSelection,
-                    segments: mainTabs.map { tab in
-                        GlassSegment(value: tab, title: tab.title(language: settings.language), systemImage: nil)
-                    },
-                    segmentWidth: 74
+            StaticGlassTabControl(
+                selection: mainTabSelection,
+                segments: mainTabs.map { tab in
+                    GlassSegment(value: tab, title: tab.title(language: settings.language), systemImage: nil)
+                },
+                segmentWidth: 74
+            )
+
+            TooltipIconButton(
+                text: t(.extraTab, language: settings.language),
+                systemImage: selectedTab == .extra ? "arrow.left.circle" : "ellipsis",
+                fontSize: 17
+            ) {
+                toggleLibraryTab(.extra)
+            }
+            .frame(width: 26, height: 26)
+            .liquidGlass(cornerRadius: 20, isActive: selectedTab == .extra)
+            .clipShape(Circle())
+
+            TooltipIconButton(
+                text: t(.quit, language: settings.language),
+                systemImage: "power.circle.fill",
+                fontSize: 17
+            ) {
+                NSApplication.shared.terminate(nil)
+            }
+            .keyboardShortcut("q")
+            .frame(width: 26, height: 26)
+            .liquidGlass(cornerRadius: 20, isActive: false)
+            .clipShape(Circle())
+        }
+        .frame(height: 42)
+        .transaction { transaction in
+            transaction.animation = nil
+        }
+    }
+
+    private var tabContent: some View {
+        ZStack {
+            switch selectedTab {
+            case .search:
+                searchContent
+                    .transition(.opacity.combined(with: .move(edge: .leading)))
+            case .settings:
+                SettingsView(
+                    settings: $settings,
+                    language: settings.language
                 )
-
-                TooltipIconButton(
-                    text: t(.extraTab, language: settings.language),
-                    systemImage: selectedTab == .extra ? "arrow.left.circle" : "ellipsis",
-                    fontSize: 17
-                ) {
-                    toggleLibraryTab(.extra)
-                }
-                .frame(width: 26, height: 26)
-                .liquidGlass(cornerRadius: 20, isActive: selectedTab == .extra)
-                .clipShape(Circle())
-
-                TooltipIconButton(
-                    text: t(.quit, language: settings.language),
-                    systemImage: "power.circle.fill",
-                    fontSize: 17
-                ) {
-                    NSApplication.shared.terminate(nil)
-                }
-                .keyboardShortcut("q")
-                .frame(width: 26, height: 26)
-                .liquidGlass(cornerRadius: 20, isActive: false)
-                .clipShape(Circle())
+                .transition(.opacity.combined(with: .move(edge: .trailing)))
+            case .extra:
+                ExtraView(
+                    settings: $settings,
+                    user: user,
+                    isCheckingQuota: isCheckingQuota,
+                    quotaErrorText: quotaErrorText,
+                    language: settings.language,
+                    checkQuota: checkQuota,
+                    clearCache: clearPreviewImageCache
+                )
+                .transition(.opacity.combined(with: .move(edge: .trailing)))
+            case .history:
+                HistoryView(
+                    history: history,
+                    language: settings.language,
+                    openHistory: openHistory(_:),
+                    deleteHistory: deleteHistory(_:),
+                    clearHistory: clearHistory
+                )
+                .transition(.opacity.combined(with: .move(edge: .leading)))
+            case .favorites:
+                FavoritesView(
+                    favorites: favorites,
+                    settings: settings,
+                    language: settings.language,
+                    toggleFavorite: toggleFavorite(_:)
+                )
+                .transition(.opacity.combined(with: .move(edge: .leading)))
             }
-            .frame(height: 42)
-            .transaction { transaction in
-                transaction.animation = nil
-            }
+        }
+        .animation(.easeInOut(duration: 0.18), value: selectedTab)
+    }
 
-            ZStack {
-                switch selectedTab {
-                case .search:
-                    searchContent
-                        .transition(.opacity.combined(with: .move(edge: .leading)))
-                case .settings:
-                    SettingsView(
-                        settings: $settings,
-                        language: settings.language
-                    )
-                    .transition(.opacity.combined(with: .move(edge: .trailing)))
-                case .extra:
-                    ExtraView(
-                        settings: $settings,
-                        user: user,
-                        isCheckingQuota: isCheckingQuota,
-                        quotaErrorText: quotaErrorText,
-                        language: settings.language,
-                        checkQuota: checkQuota,
-                        clearCache: clearPreviewImageCache
-                    )
-                    .transition(.opacity.combined(with: .move(edge: .trailing)))
-                case .history:
-                    HistoryView(
-                        history: history,
-                        language: settings.language,
-                        openHistory: openHistory(_:),
-                        deleteHistory: deleteHistory(_:),
-                        clearHistory: clearHistory
-                    )
-                    .transition(.opacity.combined(with: .move(edge: .leading)))
-                case .favorites:
-                    FavoritesView(
-                        favorites: favorites,
-                        settings: settings,
-                        language: settings.language,
-                        toggleFavorite: toggleFavorite(_:)
-                    )
-                    .transition(.opacity.combined(with: .move(edge: .leading)))
-                }
-            }
-            .animation(.easeInOut(duration: 0.18), value: selectedTab)
+    private var rootStack: some View {
+        VStack(spacing: 12) {
+            headerBar
 
+            tabContent
         }
         .padding(14)
         .frame(width: 430)
@@ -159,32 +166,44 @@ struct MenuBarRootView: View {
         .onPreferenceChange(ViewSizePreferenceKey.self) { size in
             onSizeChange(size)
         }
-        .onAppear {
-            if !didLoadSettings {
-                loadSettings()
-                loadLibrary()
-                didLoadSettings = true
-            }
-        }
-        .onChange(of: settings) { previousSettings, nextSettings in
-            saveSettings(nextSettings)
+    }
 
-            if previousSettings.apiKey != nextSettings.apiKey {
-                quotaNeedsRefresh = true
-                user = nil
+    var body: some View {
+        rootStack
+            .onAppear {
+                if !didLoadSettings {
+                    loadSettings()
+                    loadLibrary()
+                    didLoadSettings = true
+                }
             }
-        }
-        .onChange(of: history) { _, nextHistory in
-            saveHistory(nextHistory)
-        }
-        .onChange(of: favorites) { _, nextFavorites in
-            saveFavorites(nextFavorites)
-        }
-        .onChange(of: selectedTab) { _, nextTab in
-            if nextTab == .extra {
-                checkQuota()
+            .onChange(of: settings) { previousSettings, nextSettings in
+                saveSettings(nextSettings)
+
+                if previousSettings.apiKey != nextSettings.apiKey {
+                    quotaNeedsRefresh = true
+                    user = nil
+                }
             }
-        }
+            .onChange(of: history) { _, nextHistory in
+                saveHistory(nextHistory)
+            }
+            .onChange(of: favorites) { _, nextFavorites in
+                saveFavorites(nextFavorites)
+            }
+            .onChange(of: selectedTab) { _, nextTab in
+                if nextTab == .extra {
+                    checkQuota()
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .runClipboardSearch)) { _ in
+                handleClipboardSearchRequest()
+            }
+    }
+
+    private func handleClipboardSearchRequest() {
+        selectedTab = .search
+        searchClipboard()
     }
 
     private var mainTabSelection: Binding<RootTab> {
