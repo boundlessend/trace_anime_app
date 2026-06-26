@@ -14,6 +14,7 @@ enum L10nKey: String {
     case copyResult
     case openMAL
     case copyDetails
+    case share
     case favorite
     case removeFavorite
     case more
@@ -31,6 +32,8 @@ enum L10nKey: String {
     case mutePreview
     case preview
     case previewHint
+    case historyHint
+    case captureHotKeyHint
     case language
     case apiKey
     case anilistIDFilter
@@ -94,6 +97,8 @@ private func englishText(_ key: L10nKey) -> String {
         return "Copy MyAnimeList link and open"
     case .copyDetails:
         return "Copy details"
+    case .share:
+        return "Share"
     case .favorite:
         return "Add to favorites"
     case .removeFavorite:
@@ -128,6 +133,10 @@ private func englishText(_ key: L10nKey) -> String {
         return "Preview quality"
     case .previewHint:
         return "S/M/L changes downloaded preview size and load speed."
+    case .historyHint:
+        return "How many recent searches to keep in history."
+    case .captureHotKeyHint:
+        return "Global hotkey to capture a screen area and search."
     case .language:
         return "Language"
     case .apiKey:
@@ -203,6 +212,8 @@ private func russianText(_ key: L10nKey) -> String {
         return "Скопировать ссылку MyAnimeList и открыть"
     case .copyDetails:
         return "Скопировать данные"
+    case .share:
+        return "Поделиться"
     case .favorite:
         return "Добавить в избранное"
     case .removeFavorite:
@@ -237,6 +248,10 @@ private func russianText(_ key: L10nKey) -> String {
         return "Качество превью"
     case .previewHint:
         return "S/M/L меняет размер загружаемого превью и скорость загрузки."
+    case .historyHint:
+        return "Сколько последних поисков хранить в истории."
+    case .captureHotKeyHint:
+        return "Глобальный хоткей для захвата области экрана и поиска."
     case .language:
         return "Язык"
     case .apiKey:
@@ -312,6 +327,8 @@ private func frenchText(_ key: L10nKey) -> String {
         return "Copier le lien MyAnimeList et ouvrir"
     case .copyDetails:
         return "Copier les détails"
+    case .share:
+        return "Partager"
     case .favorite:
         return "Ajouter aux favoris"
     case .removeFavorite:
@@ -346,6 +363,10 @@ private func frenchText(_ key: L10nKey) -> String {
         return "Qualité de l'aperçu"
     case .previewHint:
         return "S/M/L change la taille téléchargée et la vitesse de chargement."
+    case .historyHint:
+        return "Combien de recherches récentes conserver dans l'historique."
+    case .captureHotKeyHint:
+        return "Raccourci global pour capturer une zone de l'écran et rechercher."
     case .language:
         return "Langue"
     case .apiKey:
