@@ -77,12 +77,6 @@ Pour ouvrir l'application:
 
 Vous ne faites cela qu'au premier lancement. Les releases sans cette alerte exigent un certificat Apple Developer ID et une notarisation Apple.
 
-## Vérification
-
-```bash
-./script/build_and_run.sh --verify
-```
-
 ## Notes
 
 - Le token trace.moe est optionnel et stocké dans les réglages de l'application.

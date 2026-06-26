@@ -77,12 +77,6 @@ To open the app:
 
 You only need this on the first launch. Releases that open without this prompt require an Apple Developer ID certificate and Apple notarization.
 
-## Verify
-
-```bash
-./script/build_and_run.sh --verify
-```
-
 ## Notes
 
 - The trace.moe token is optional and is stored in app settings.
