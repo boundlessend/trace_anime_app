@@ -5,8 +5,30 @@ struct SettingsView: View {
 
     let language: AppLanguage
 
+    @State private var launchAtLogin: Bool = false
+
+    private let loginItemService: LoginItemService = LoginItemService()
+
     var body: some View {
         VStack(alignment: .center, spacing: 14) {
+            Toggle(t(.launchAtLogin, language: language), isOn: $launchAtLogin)
+                .toggleStyle(GlassToggleStyle())
+                .frame(maxWidth: .infinity, alignment: .center)
+                .onAppear {
+                    launchAtLogin = loginItemService.isEnabled()
+                }
+                .onChange(of: launchAtLogin) { _, nextValue in
+                    if nextValue == loginItemService.isEnabled() {
+                        return
+                    }
+
+                    do {
+                        try loginItemService.setEnabled(nextValue)
+                    } catch {
+                        launchAtLogin = loginItemService.isEnabled()
+                    }
+                }
+
             VStack(alignment: .center, spacing: 6) {
                 Toggle(t(.cutBorders, language: language), isOn: $settings.cutBorders)
                     .toggleStyle(GlassToggleStyle())
