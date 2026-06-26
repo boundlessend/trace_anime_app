@@ -14,6 +14,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Install create-dmg
+        # sindresorhus/create-dmg (npm), not the homebrew formula - build_dmg.sh relies on its flags
         run: npm install -g create-dmg
 
       - name: Build DMG
