@@ -26,10 +26,10 @@ L'application accepte une URL d'image, la dernière image du presse-papiers, une
 ## Fonctionnalités
 
 - Interface uniquement dans la barre de menu macOS.
-- Recherche par URL d'image, presse-papiers, glisser-déposer, fichier local ou capture d'une zone de l'écran via un raccourci global (Option+Cmd+S).
+- Recherche par URL d'image, presse-papiers, glisser-déposer, fichier local ou capture d'une zone de l'écran via un raccourci global configurable.
 - Lecture d'aperçu directement dans les résultats.
-- Ouverture des correspondances sur AniList ou MyAnimeList et copie des détails du résultat.
-- Favoris et historique (avec suppression d'une entrée et effacement complet) conservant l'image recherchée.
+- Ouverture des correspondances sur AniList ou MyAnimeList, copie des détails, glisser le cadre vers l'extérieur ou partager.
+- Favoris et historique (taille configurable, suppression d'une entrée et effacement complet) conservant l'image recherchée.
 - Affichage du quota trace.moe et token API optionnel.
 - Notification lorsqu'une nouvelle version est disponible.
 - Lancement à la connexion.

@@ -26,10 +26,10 @@ It accepts an image URL, the latest image from the clipboard, a dragged image, o
 ## Features
 
 - Menu bar-only macOS interface.
-- Search by image URL, clipboard image, drag and drop, local file, or screen-area capture with a global hotkey (Option+Cmd+S).
+- Search by image URL, clipboard image, drag and drop, local file, or screen-area capture with a configurable global hotkey.
 - Inline preview playback for search results.
-- Open matches on AniList or MyAnimeList and copy result details.
-- Favorites and search history (with per-entry delete and clear all) keeping the original searched image.
+- Open matches on AniList or MyAnimeList, copy result details, drag the frame out, or share it.
+- Favorites and search history (configurable size, per-entry delete and clear all) keeping the original searched image.
 - trace.moe quota view and optional API token.
 - Update notice when a newer release is available.
 - Launch at login.
