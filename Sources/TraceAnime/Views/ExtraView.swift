@@ -6,6 +6,13 @@ struct ExtraView: View {
     @Binding var settings: AppSettings
 
     @State private var didClearCache: Bool = false
+    @State private var availableUpdate: AppRelease?
+
+    private let updateCheckService: UpdateCheckService = UpdateCheckService(
+        session: .shared,
+        releasesURL: URL(string: "https://api.github.com/repos/boundlessend/trace_anime_app/releases/latest")!,
+        decoder: JSONDecoder()
+    )
 
     let user: TraceMoeUser?
     let isCheckingQuota: Bool
@@ -81,14 +88,31 @@ struct ExtraView: View {
                     .transition(.opacity)
             }
 
+            if let availableUpdate: AppRelease {
+                Button {
+                    openURL(availableUpdate.url)
+                } label: {
+                    Label(
+                        "\(t(.updateAvailable, language: language)): \(availableUpdate.version)",
+                        systemImage: "arrow.down.circle"
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(TracePressButtonStyle())
+            }
+
             Divider()
 
             StickyCopyrightView(text: t(.copyright, language: language))
         }
         .animation(.easeInOut(duration: 0.2), value: isCheckingQuota)
         .animation(.easeInOut(duration: 0.2), value: user?.quotaUsed)
+        .animation(.easeInOut(duration: 0.2), value: availableUpdate)
         .onAppear {
             checkQuota()
+        }
+        .task {
+            availableUpdate = try? await updateCheckService.availableUpdate(currentVersion: currentAppVersion())
         }
     }
 }

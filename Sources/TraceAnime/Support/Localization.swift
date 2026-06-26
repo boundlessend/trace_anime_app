@@ -40,6 +40,7 @@ enum L10nKey: String {
     case priority
     case copyright
     case clearCache
+    case updateAvailable
     case source
     case sourceClipboard
     case sourceImage
@@ -139,6 +140,8 @@ private func englishText(_ key: L10nKey) -> String {
         return "© boundlessend"
     case .clearCache:
         return "Clear cache"
+    case .updateAvailable:
+        return "Update available"
     case .source:
         return "Source"
     case .sourceClipboard:
@@ -234,6 +237,8 @@ private func russianText(_ key: L10nKey) -> String {
         return "© boundlessend"
     case .clearCache:
         return "Очистить кэш"
+    case .updateAvailable:
+        return "Доступно обновление"
     case .source:
         return "Источник"
     case .sourceClipboard:
@@ -329,6 +334,8 @@ private func frenchText(_ key: L10nKey) -> String {
         return "© boundlessend"
     case .clearCache:
         return "Vider le cache"
+    case .updateAvailable:
+        return "Mise à jour disponible"
     case .source:
         return "Source"
     case .sourceClipboard:
