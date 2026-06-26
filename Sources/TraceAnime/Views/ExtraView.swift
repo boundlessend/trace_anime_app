@@ -6,7 +6,9 @@ struct ExtraView: View {
     @Binding var settings: AppSettings
 
     @State private var didClearCache: Bool = false
-    @State private var availableUpdate: AppRelease?
+    @State private var isCheckingUpdate: Bool = false
+    @State private var updateResult: UpdateCheckResult?
+    @State private var showUpdateAlert: Bool = false
 
     private let updateCheckService: UpdateCheckService = UpdateCheckService(
         session: .shared,
@@ -76,6 +78,7 @@ struct ExtraView: View {
             } label: {
                 Label(t(.clearCache, language: language), systemImage: "trash")
                     .frame(maxWidth: .infinity)
+                    .symbolEffect(.bounce, value: didClearCache)
             }
             .buttonStyle(TracePressButtonStyle())
 
@@ -88,18 +91,30 @@ struct ExtraView: View {
                     .transition(.opacity)
             }
 
-            if let availableUpdate: AppRelease {
+            VStack(spacing: 6) {
+                Text("\(t(.version, language: language)) \(currentAppVersion())")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
                 Button {
-                    openURL(availableUpdate.url)
+                    checkForUpdate()
                 } label: {
-                    Label(
-                        "\(t(.updateAvailable, language: language)): \(availableUpdate.version)",
-                        systemImage: "arrow.down.circle"
-                    )
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .rotationEffect(.degrees(isCheckingUpdate ? 360 : 0))
+                            .animation(
+                                isCheckingUpdate
+                                    ? .linear(duration: 0.9).repeatForever(autoreverses: false) : .default,
+                                value: isCheckingUpdate
+                            )
+                        Text(t(.checkUpdates, language: language))
+                    }
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(TracePressButtonStyle())
+                .disabled(isCheckingUpdate)
             }
+            .frame(maxWidth: .infinity, alignment: .center)
 
             Divider()
 
@@ -107,14 +122,82 @@ struct ExtraView: View {
         }
         .animation(.easeInOut(duration: 0.2), value: isCheckingQuota)
         .animation(.easeInOut(duration: 0.2), value: user?.quotaUsed)
-        .animation(.easeInOut(duration: 0.2), value: availableUpdate)
+        .animation(.easeInOut(duration: 0.2), value: isCheckingUpdate)
+        .sensoryFeedback(trigger: updateResult) { _, newValue in
+            guard let newValue: UpdateCheckResult else {
+                return nil
+            }
+
+            switch newValue {
+            case .available, .upToDate:
+                return .success
+            case .failed:
+                return .error
+            }
+        }
         .onAppear {
             checkQuota()
         }
-        .task {
-            availableUpdate = try? await updateCheckService.availableUpdate(currentVersion: currentAppVersion())
+        .alert(t(.checkUpdates, language: language), isPresented: $showUpdateAlert, presenting: updateResult) {
+            result in
+            updateAlertButtons(result)
+        } message: { result in
+            Text(updateAlertMessage(result))
         }
     }
+
+    @ViewBuilder
+    private func updateAlertButtons(_ result: UpdateCheckResult) -> some View {
+        switch result {
+        case .available(let release):
+            Button(t(.download, language: language)) {
+                openURL(release.url)
+            }
+            Button(t(.cancel, language: language), role: .cancel) {}
+        case .upToDate, .failed:
+            Button("OK", role: .cancel) {}
+        }
+    }
+
+    private func updateAlertMessage(_ result: UpdateCheckResult) -> String {
+        switch result {
+        case .available(let release):
+            return "\(t(.updateAvailable, language: language)): \(release.version)"
+        case .upToDate:
+            return "\(t(.upToDate, language: language)) (\(currentAppVersion()))"
+        case .failed:
+            return t(.updateFailed, language: language)
+        }
+    }
+
+    private func checkForUpdate() {
+        isCheckingUpdate = true
+        Task { @MainActor in
+            let result: UpdateCheckResult
+
+            do {
+                if let release: AppRelease = try await updateCheckService.availableUpdate(
+                    currentVersion: currentAppVersion())
+                {
+                    result = .available(release)
+                } else {
+                    result = .upToDate
+                }
+            } catch {
+                result = .failed
+            }
+
+            isCheckingUpdate = false
+            updateResult = result
+            showUpdateAlert = true
+        }
+    }
+}
+
+enum UpdateCheckResult: Equatable {
+    case upToDate
+    case available(AppRelease)
+    case failed
 }
 
 struct StickyCopyrightView: View {

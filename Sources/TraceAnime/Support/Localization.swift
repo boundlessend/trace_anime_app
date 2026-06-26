@@ -41,6 +41,12 @@ enum L10nKey: String {
     case copyright
     case clearCache
     case updateAvailable
+    case version
+    case checkUpdates
+    case upToDate
+    case updateFailed
+    case download
+    case cancel
     case source
     case sourceClipboard
     case sourceImage
@@ -142,6 +148,18 @@ private func englishText(_ key: L10nKey) -> String {
         return "Clear cache"
     case .updateAvailable:
         return "Update available"
+    case .version:
+        return "Version"
+    case .checkUpdates:
+        return "Check for updates"
+    case .upToDate:
+        return "You have the latest version"
+    case .updateFailed:
+        return "Update check failed"
+    case .download:
+        return "Download"
+    case .cancel:
+        return "Cancel"
     case .source:
         return "Source"
     case .sourceClipboard:
@@ -239,6 +257,18 @@ private func russianText(_ key: L10nKey) -> String {
         return "Очистить кэш"
     case .updateAvailable:
         return "Доступно обновление"
+    case .version:
+        return "Версия"
+    case .checkUpdates:
+        return "Проверить обновления"
+    case .upToDate:
+        return "У вас последняя версия"
+    case .updateFailed:
+        return "Не удалось проверить обновления"
+    case .download:
+        return "Скачать"
+    case .cancel:
+        return "Отмена"
     case .source:
         return "Источник"
     case .sourceClipboard:
@@ -336,6 +366,18 @@ private func frenchText(_ key: L10nKey) -> String {
         return "Vider le cache"
     case .updateAvailable:
         return "Mise à jour disponible"
+    case .version:
+        return "Version"
+    case .checkUpdates:
+        return "Vérifier les mises à jour"
+    case .upToDate:
+        return "Vous avez la dernière version"
+    case .updateFailed:
+        return "Échec de la vérification des mises à jour"
+    case .download:
+        return "Télécharger"
+    case .cancel:
+        return "Annuler"
     case .source:
         return "Source"
     case .sourceClipboard:
