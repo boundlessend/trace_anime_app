@@ -211,6 +211,7 @@ struct SearchResultRowView: View {
         }
         .padding(10)
         .liquidGlass(cornerRadius: 12, isActive: false)
+        .sensoryFeedback(.impact, trigger: isFavorite)
     }
 }
 
