@@ -12,17 +12,22 @@ enum L10nKey: String {
     case searching
     case openPreview
     case copyResult
+    case openMAL
+    case copyDetails
     case favorite
     case removeFavorite
     case more
     case history
     case favorites
+    case clearHistory
+    case deleteEntry
     case noHistory
     case noFavorites
     case restoreSearch
     case quit
     case cutBorders
     case cutBordersHint
+    case launchAtLogin
     case mutePreview
     case preview
     case previewHint
@@ -78,6 +83,10 @@ private func englishText(_ key: L10nKey) -> String {
         return "Play preview"
     case .copyResult:
         return "Copy AniList link and open"
+    case .openMAL:
+        return "Copy MyAnimeList link and open"
+    case .copyDetails:
+        return "Copy details"
     case .favorite:
         return "Add to favorites"
     case .removeFavorite:
@@ -88,6 +97,10 @@ private func englishText(_ key: L10nKey) -> String {
         return "History"
     case .favorites:
         return "Favorites"
+    case .clearHistory:
+        return "Clear all"
+    case .deleteEntry:
+        return "Delete"
     case .noHistory:
         return "No searches yet"
     case .noFavorites:
@@ -100,6 +113,8 @@ private func englishText(_ key: L10nKey) -> String {
         return "Cut borders"
     case .cutBordersHint:
         return "Crops frame borders before search; useful for letterboxed images."
+    case .launchAtLogin:
+        return "Launch at login"
     case .mutePreview:
         return "Mute preview"
     case .preview:
@@ -163,6 +178,10 @@ private func russianText(_ key: L10nKey) -> String {
         return "Воспроизвести превью"
     case .copyResult:
         return "Скопировать ссылку AniList и открыть"
+    case .openMAL:
+        return "Скопировать ссылку MyAnimeList и открыть"
+    case .copyDetails:
+        return "Скопировать данные"
     case .favorite:
         return "Добавить в избранное"
     case .removeFavorite:
@@ -173,6 +192,10 @@ private func russianText(_ key: L10nKey) -> String {
         return "История"
     case .favorites:
         return "Избранное"
+    case .clearHistory:
+        return "Очистить всё"
+    case .deleteEntry:
+        return "Удалить"
     case .noHistory:
         return "История пуста"
     case .noFavorites:
@@ -185,6 +208,8 @@ private func russianText(_ key: L10nKey) -> String {
         return "Обрезать рамки"
     case .cutBordersHint:
         return "Обрезает поля кадра перед поиском; полезно для изображений с рамками."
+    case .launchAtLogin:
+        return "Запускать при входе"
     case .mutePreview:
         return "Без звука"
     case .preview:
@@ -248,6 +273,10 @@ private func frenchText(_ key: L10nKey) -> String {
         return "Lire l'aperçu"
     case .copyResult:
         return "Copier le lien AniList et ouvrir"
+    case .openMAL:
+        return "Copier le lien MyAnimeList et ouvrir"
+    case .copyDetails:
+        return "Copier les détails"
     case .favorite:
         return "Ajouter aux favoris"
     case .removeFavorite:
@@ -258,6 +287,10 @@ private func frenchText(_ key: L10nKey) -> String {
         return "Historique"
     case .favorites:
         return "Favoris"
+    case .clearHistory:
+        return "Tout effacer"
+    case .deleteEntry:
+        return "Supprimer"
     case .noHistory:
         return "Aucune recherche"
     case .noFavorites:
@@ -270,6 +303,8 @@ private func frenchText(_ key: L10nKey) -> String {
         return "Rogner les bords"
     case .cutBordersHint:
         return "Rogne les bords avant la recherche; utile pour les images encadrées."
+    case .launchAtLogin:
+        return "Lancer à la connexion"
     case .mutePreview:
         return "Aperçu muet"
     case .preview:
