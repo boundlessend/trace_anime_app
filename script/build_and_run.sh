@@ -17,6 +17,9 @@ APP_RESOURCES="$APP_CONTENTS/Resources"
 APP_ICON="$ROOT_DIR/Assets/TraceAnime.icns"
 MENU_BAR_ICON="$ROOT_DIR/Assets/MenuBarIcon.png"
 
+APP_VERSION="${APP_VERSION:-$(git -C "$ROOT_DIR" describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")}"
+APP_VERSION="${APP_VERSION#v}"
+
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
 swift "$ROOT_DIR/script/generate_icons.swift" "$ROOT_DIR"
@@ -46,6 +49,10 @@ cat >"$INFO_PLIST" <<PLIST
   <string>$APP_NAME</string>
   <key>CFBundleIconFile</key>
   <string>TraceAnime</string>
+  <key>CFBundleShortVersionString</key>
+  <string>$APP_VERSION</string>
+  <key>CFBundleVersion</key>
+  <string>$APP_VERSION</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>LSMinimumSystemVersion</key>

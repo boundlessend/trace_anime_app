@@ -18,6 +18,8 @@ jobs:
 
       - name: Build DMG
         run: ./script/build_dmg.sh
+        env:
+          APP_VERSION: ${{ github.ref_name }}
 
       - name: Publish release
         env:
