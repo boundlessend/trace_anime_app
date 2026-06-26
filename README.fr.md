@@ -31,6 +31,7 @@ L'application accepte une URL d'image, la dernière image du presse-papiers, une
 - Ouverture des correspondances sur AniList ou MyAnimeList et copie des détails du résultat.
 - Favoris et historique (avec suppression d'une entrée et effacement complet) conservant l'image recherchée.
 - Affichage du quota trace.moe et token API optionnel.
+- Notification lorsqu'une nouvelle version est disponible.
 - Lancement à la connexion.
 - Interface en anglais, russe et français.
 - Licence open source BSD 3-Clause.
