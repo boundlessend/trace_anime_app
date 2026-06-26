@@ -13,6 +13,7 @@
 </p>
 
 <p align="center">
+  <img alt="CI" src="https://github.com/boundlessend/trace_anime_app/actions/workflows/ci.yml/badge.svg">
   <img alt="macOS" src="https://img.shields.io/badge/macOS-14%2B-111827">
   <img alt="Swift" src="https://img.shields.io/badge/Swift-5.9-f05138">
   <img alt="лицензия" src="https://img.shields.io/badge/license-BSD--3--Clause-2563eb">
