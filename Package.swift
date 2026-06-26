@@ -11,6 +11,7 @@ let package: Package = Package(
         .executable(name: "TraceAnime", targets: ["TraceAnime"])
     ],
     targets: [
-        .executableTarget(name: "TraceAnime")
+        .executableTarget(name: "TraceAnime"),
+        .testTarget(name: "TraceAnimeTests", dependencies: ["TraceAnime"])
     ]
 )
