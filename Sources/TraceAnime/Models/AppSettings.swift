@@ -6,6 +6,27 @@ struct AppSettings: Equatable {
     var previewSize: PreviewSize
     var anilistIDText: String
     var language: AppLanguage
+    var historyLimit: HistorySize
+    var captureHotKey: HotKeyOption
+}
+
+enum HistorySize: String, CaseIterable, Identifiable {
+    case ten = "10"
+    case twenty = "20"
+    case fifty = "50"
+    case hundred = "100"
+
+    var id: String {
+        rawValue
+    }
+
+    var title: String {
+        rawValue
+    }
+
+    var limit: Int {
+        Int(rawValue) ?? 20
+    }
 }
 
 enum PreviewSize: String, CaseIterable, Identifiable {
@@ -56,6 +77,8 @@ func defaultAppSettings() -> AppSettings {
         cutBorders: true,
         previewSize: .medium,
         anilistIDText: "",
-        language: .english
+        language: .english,
+        historyLimit: .twenty,
+        captureHotKey: .optionCommandS
     )
 }

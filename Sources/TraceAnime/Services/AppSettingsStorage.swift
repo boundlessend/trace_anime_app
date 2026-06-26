@@ -34,6 +34,18 @@ struct AppSettingsStorage {
             settings.language = language
         }
 
+        if let historyLimitRaw: String = userDefaults.string(forKey: SettingsStorageKey.historyLimit.rawValue),
+            let historyLimit: HistorySize = HistorySize(rawValue: historyLimitRaw)
+        {
+            settings.historyLimit = historyLimit
+        }
+
+        if let captureHotKeyRaw: String = userDefaults.string(forKey: SettingsStorageKey.captureHotKey.rawValue),
+            let captureHotKey: HotKeyOption = HotKeyOption(rawValue: captureHotKeyRaw)
+        {
+            settings.captureHotKey = captureHotKey
+        }
+
         return settings
     }
 
@@ -43,6 +55,8 @@ struct AppSettingsStorage {
         userDefaults.set(settings.previewSize.rawValue, forKey: SettingsStorageKey.previewSize.rawValue)
         userDefaults.set(settings.anilistIDText, forKey: SettingsStorageKey.anilistIDText.rawValue)
         userDefaults.set(settings.language.rawValue, forKey: SettingsStorageKey.language.rawValue)
+        userDefaults.set(settings.historyLimit.rawValue, forKey: SettingsStorageKey.historyLimit.rawValue)
+        userDefaults.set(settings.captureHotKey.rawValue, forKey: SettingsStorageKey.captureHotKey.rawValue)
     }
 }
 
@@ -52,4 +66,6 @@ enum SettingsStorageKey: String {
     case previewSize = "previewSize"
     case anilistIDText = "anilistIDText"
     case language = "language"
+    case historyLimit = "historyLimit"
+    case captureHotKey = "captureHotKey"
 }

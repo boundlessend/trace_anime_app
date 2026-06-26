@@ -59,6 +59,40 @@ struct SettingsView: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
 
+            VStack(alignment: .center, spacing: 6) {
+                GlassSegmentedControl(
+                    selection: $settings.historyLimit,
+                    segments: HistorySize.allCases.map { size in
+                        GlassSegment(value: size, title: size.title, systemImage: nil)
+                    }
+                )
+
+                Text(t(.historyHint, language: language))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+
+            VStack(alignment: .center, spacing: 6) {
+                GlassSegmentedControl(
+                    selection: $settings.captureHotKey,
+                    segments: HotKeyOption.allCases.map { option in
+                        GlassSegment(value: option, title: option.title, systemImage: nil)
+                    }
+                )
+
+                Text(t(.captureHotKeyHint, language: language))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+
             GlassSegmentedControl(
                 selection: $settings.language,
                 segments: AppLanguage.allCases.map { language in

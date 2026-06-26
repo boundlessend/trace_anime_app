@@ -184,6 +184,14 @@ struct MenuBarRootView: View {
                     quotaNeedsRefresh = true
                     user = nil
                 }
+
+                if previousSettings.historyLimit != nextSettings.historyLimit {
+                    history = Array(history.prefix(nextSettings.historyLimit.limit))
+                }
+
+                if previousSettings.captureHotKey != nextSettings.captureHotKey {
+                    NotificationCenter.default.post(name: .captureHotKeyChanged, object: nil)
+                }
             }
             .onChange(of: history) { _, nextHistory in
                 saveHistory(nextHistory)
@@ -325,7 +333,7 @@ struct MenuBarRootView: View {
 
     private func addHistory(title: String, response: TraceMoeSearchResponse, sourceImage: SearchImageSnapshot?) {
         let nextEntry: SearchHistoryEntry = makeHistoryEntry(title: title, response: response, sourceImage: sourceImage)
-        history = Array(([nextEntry] + history).prefix(20))
+        history = Array(([nextEntry] + history).prefix(settings.historyLimit.limit))
     }
 
     private func openHistory(_ entry: SearchHistoryEntry) {

@@ -1,5 +1,4 @@
 import AppKit
-import Carbon.HIToolbox
 import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -67,8 +66,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let service: HotKeyService = HotKeyService { [weak self] in
             self?.handleCaptureHotKey()
         }
-        service.register(keyCode: UInt32(kVK_ANSI_S), modifiers: UInt32(optionKey | cmdKey))
         hotKeyService = service
+        applyHotKeySetting()
+
+        NotificationCenter.default.addObserver(
+            forName: .captureHotKeyChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.applyHotKeySetting()
+        }
+    }
+
+    private func applyHotKeySetting() {
+        let settings: AppSettings = (try? AppSettingsStorage(userDefaults: .standard).load()) ?? defaultAppSettings()
+        hotKeyService?.register(
+            keyCode: settings.captureHotKey.keyCode, modifiers: settings.captureHotKey.modifiers)
     }
 
     private func handleCaptureHotKey() {
