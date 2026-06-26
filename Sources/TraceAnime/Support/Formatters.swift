@@ -25,6 +25,23 @@ func anilistID(anilist: AnilistReference) -> Int {
     }
 }
 
+func malID(anilist: AnilistReference) -> Int? {
+    switch anilist {
+    case .id:
+        return nil
+    case .info(let info):
+        return info.idMal
+    }
+}
+
+func resultClipboardText(result: TraceMoeResult, language: AppLanguage) -> String {
+    let title: String = displayTitle(anilist: result.anilist)
+    let episode: String = displayEpisode(result.episode, language: language)
+    let timestamp: String = displayTimestamp(result.at)
+    let similarity: String = displaySimilarity(result.similarity)
+    return "\(title) - \(episode) · \(timestamp) (\(similarity))"
+}
+
 func displayEpisode(_ episode: EpisodeReference?, language: AppLanguage) -> String {
     guard let episode: EpisodeReference else {
         return t(.episodeUnknown, language: language)

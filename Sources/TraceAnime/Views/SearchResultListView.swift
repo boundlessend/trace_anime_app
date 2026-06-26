@@ -185,6 +185,28 @@ struct SearchResultRowView: View {
                 }
                 .frame(width: 30, height: 26)
                 .liquidGlass(cornerRadius: 13, isActive: false)
+
+                if let malID: Int = malID(anilist: result.anilist) {
+                    TooltipIconButton(
+                        text: t(.openMAL, language: language),
+                        systemImage: "link",
+                        fontSize: 15
+                    ) {
+                        copyURLAndOpen(URL(string: "https://myanimelist.net/anime/\(malID)")!)
+                    }
+                    .frame(width: 30, height: 26)
+                    .liquidGlass(cornerRadius: 13, isActive: false)
+                }
+
+                TooltipIconButton(
+                    text: t(.copyDetails, language: language),
+                    systemImage: "doc.on.doc",
+                    fontSize: 15
+                ) {
+                    copyText(resultClipboardText(result: result, language: language))
+                }
+                .frame(width: 30, height: 26)
+                .liquidGlass(cornerRadius: 13, isActive: false)
             }
         }
         .padding(10)
@@ -457,4 +479,9 @@ func copyURLAndOpen(_ url: URL) {
     NSPasteboard.general.clearContents()
     NSPasteboard.general.setString(url.absoluteString, forType: .string)
     openURL(url)
+}
+
+func copyText(_ text: String) {
+    NSPasteboard.general.clearContents()
+    NSPasteboard.general.setString(text, forType: .string)
 }
