@@ -134,6 +134,10 @@ struct SearchResultRowView: View {
                 .frame(width: 112, height: 63)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
                 .id(previewURL(result.image, size: settings.previewSize, muteVideo: false))
+                .onDrag {
+                    NSItemProvider(
+                        object: previewURL(result.image, size: settings.previewSize, muteVideo: false) as NSURL)
+                }
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(displayTitle(anilist: result.anilist))
@@ -207,6 +211,19 @@ struct SearchResultRowView: View {
                 }
                 .frame(width: 30, height: 26)
                 .liquidGlass(cornerRadius: 13, isActive: false)
+
+                ShareLink(
+                    item: URL(string: "https://anilist.co/anime/\(anilistID(anilist: result.anilist))")!,
+                    subject: Text(displayTitle(anilist: result.anilist)),
+                    message: Text(resultClipboardText(result: result, language: language))
+                ) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 15))
+                        .frame(width: 30, height: 26)
+                }
+                .buttonStyle(.plain)
+                .liquidGlass(cornerRadius: 13, isActive: false)
+                .help(t(.share, language: language))
             }
         }
         .padding(10)
