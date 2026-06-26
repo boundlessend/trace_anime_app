@@ -174,7 +174,8 @@ final class StickyCopyrightNSButton: NSButton {
     }
 
     private func showFloatingPanel(at point: NSPoint) {
-        let hostingView: NSHostingView<StickyFloatingCopyrightView> = NSHostingView(rootView: StickyFloatingCopyrightView(text: title))
+        let hostingView: NSHostingView<StickyFloatingCopyrightView> = NSHostingView(
+            rootView: StickyFloatingCopyrightView(text: title))
         hostingView.setFrameSize(hostingView.fittingSize)
 
         let panel: NSPanel = NSPanel(

@@ -102,7 +102,8 @@ final class TraceMoeClient {
 
     /// создает запрос без системного кэша и с коротким таймаутом
     private func makeAPIRequest(url: URL) -> URLRequest {
-        var request: URLRequest = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: requestTimeout)
+        var request: URLRequest = URLRequest(
+            url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: requestTimeout)
         request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
         return request
     }

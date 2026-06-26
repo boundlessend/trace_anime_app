@@ -64,7 +64,7 @@ struct LiquidGlassSurfaceModifier: ViewModifier {
                                 .white.opacity(isActive ? 0.22 : 0.14),
                                 .cyan.opacity(isHovering ? 0.10 : 0.0),
                                 .yellow.opacity(isHovering ? 0.08 : 0.0),
-                                .clear
+                                .clear,
                             ],
                             center: point,
                             startRadius: 0.0,
@@ -79,7 +79,7 @@ struct LiquidGlassSurfaceModifier: ViewModifier {
                                         .white.opacity(0.18),
                                         .cyan.opacity(0.14),
                                         .yellow.opacity(0.12),
-                                        .clear
+                                        .clear,
                                     ],
                                     center: point
                                 ),
@@ -148,7 +148,9 @@ struct GlassSegmentedControl<Value: Hashable>: View {
                         .modifier(GlassSegmentLabelFrame(width: segmentWidth))
                         .padding(.horizontal, 10)
                         .padding(.vertical, 3)
-                        .foregroundStyle(selection == segment.value ? Color.yellow.opacity(0.94) : Color.primary.opacity(0.82))
+                        .foregroundStyle(
+                            selection == segment.value ? Color.yellow.opacity(0.94) : Color.primary.opacity(0.82)
+                        )
                         .background {
                             if selection == segment.value {
                                 Capsule()
@@ -190,7 +192,9 @@ struct StaticGlassTabControl<Value: Hashable>: View {
                         .lineLimit(1)
                         .multilineTextAlignment(.center)
                         .frame(width: segmentWidth, height: 24)
-                        .foregroundStyle(selection == segment.value ? Color.yellow.opacity(0.94) : Color.primary.opacity(0.82))
+                        .foregroundStyle(
+                            selection == segment.value ? Color.yellow.opacity(0.94) : Color.primary.opacity(0.82)
+                        )
                         .padding(.horizontal, 10)
                         .padding(.vertical, 3)
                         .background {
@@ -210,7 +214,10 @@ struct StaticGlassTabControl<Value: Hashable>: View {
                 .buttonStyle(GlassBounceButtonStyle())
             }
         }
-        .frame(width: (segmentWidth + 20.0) * CGFloat(segments.count) + 2.0 * CGFloat(max(segments.count - 1, 0)), height: 36)
+        .frame(
+            width: (segmentWidth + 20.0) * CGFloat(segments.count) + 2.0 * CGFloat(max(segments.count - 1, 0)),
+            height: 36
+        )
         .transaction { transaction in
             transaction.animation = nil
         }

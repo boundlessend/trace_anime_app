@@ -5,7 +5,8 @@ import Foundation
 func makeSearchImageSnapshot(input: SearchInput) -> SearchImageSnapshot? {
     switch input {
     case .imageURL(let url):
-        return SearchImageSnapshot(data: nil, url: url, contentType: nil, filename: url.absoluteString, sourceKind: .url)
+        return SearchImageSnapshot(
+            data: nil, url: url, contentType: nil, filename: url.absoluteString, sourceKind: .url)
     case .imageData(let payload):
         guard let thumbnailData: Data = makeJPEGThumbnailData(data: payload.data, maxDimension: 180.0) else {
             return nil
@@ -36,7 +37,8 @@ func searchImageSourceKind(filename: String) -> SearchImageSourceKind {
 /// сжимает локальное изображение, чтобы не раздувать настройки пользователя
 func makeJPEGThumbnailData(data: Data, maxDimension: CGFloat) -> Data? {
     guard let image: NSImage = NSImage(data: data),
-          let cgImage: CGImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+        let cgImage: CGImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil)
+    else {
         return nil
     }
 
@@ -56,7 +58,8 @@ func makeJPEGThumbnailData(data: Data, maxDimension: CGFloat) -> Data? {
     thumbnail.unlockFocus()
 
     guard let tiffData: Data = thumbnail.tiffRepresentation,
-          let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData) else {
+        let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData)
+    else {
         return nil
     }
 

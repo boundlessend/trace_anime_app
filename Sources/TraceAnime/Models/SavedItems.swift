@@ -30,7 +30,9 @@ struct FavoriteResult: Codable, Equatable, Identifiable {
     let sourceImage: SearchImageSnapshot?
 }
 
-func makeHistoryEntry(title: String, response: TraceMoeSearchResponse, sourceImage: SearchImageSnapshot?) -> SearchHistoryEntry {
+func makeHistoryEntry(title: String, response: TraceMoeSearchResponse, sourceImage: SearchImageSnapshot?)
+    -> SearchHistoryEntry
+{
     SearchHistoryEntry(
         id: UUID(),
         title: title,

@@ -49,7 +49,10 @@ struct SearchInputView: View {
 
             ZStack {
                 RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(isDropTargeted ? Color.accentColor : Color.secondary.opacity(0.4), style: StrokeStyle(lineWidth: isDropTargeted ? 2.2 : 1.5, dash: [6]))
+                    .strokeBorder(
+                        isDropTargeted ? Color.accentColor : Color.secondary.opacity(0.4),
+                        style: StrokeStyle(lineWidth: isDropTargeted ? 2.2 : 1.5, dash: [6])
+                    )
                     .background(
                         RoundedRectangle(cornerRadius: 14)
                             .fill(isDropTargeted ? Color.accentColor.opacity(0.10) : Color.clear)
@@ -72,7 +75,9 @@ struct SearchInputView: View {
             .liquidGlass(cornerRadius: 14, isActive: isDropTargeted)
             .scaleEffect(isDropTargeted ? 1.015 : 1.0)
             .animation(.easeInOut(duration: 0.16), value: isDropTargeted)
-            .onDrop(of: [UTType.fileURL.identifier, UTType.image.identifier], isTargeted: $isDropTargeted, perform: handleDrop)
+            .onDrop(
+                of: [UTType.fileURL.identifier, UTType.image.identifier], isTargeted: $isDropTargeted,
+                perform: handleDrop)
         }
     }
 }
@@ -85,8 +90,9 @@ func makeURLInput(urlText: String) throws -> SearchInput {
     }
 
     guard let url: URL = URL(string: trimmed),
-          let scheme: String = url.scheme?.lowercased(),
-          scheme == "http" || scheme == "https" else {
+        let scheme: String = url.scheme?.lowercased(),
+        scheme == "http" || scheme == "https"
+    else {
         throw AppError.invalidURL(urlText)
     }
 

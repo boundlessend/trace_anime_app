@@ -7,13 +7,15 @@ func decodeDroppedFileURL(item: NSSecureCoding?) throws -> URL {
     }
 
     if let data: Data = item as? Data,
-       let url: URL = URL(dataRepresentation: data, relativeTo: nil) {
+        let url: URL = URL(dataRepresentation: data, relativeTo: nil)
+    {
         return try validatedDroppedFileURL(url)
     }
 
     if let string: String = item as? String {
         if let url: URL = URL(string: string),
-           url.isFileURL {
+            url.isFileURL
+        {
             return try validatedDroppedFileURL(url)
         }
 

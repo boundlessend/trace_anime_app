@@ -9,7 +9,7 @@ func displayTitle(anilist: AnilistReference) -> String {
             info.title.english,
             info.title.romaji,
             info.title.native,
-            info.synonyms.first
+            info.synonyms.first,
         ]
 
         return candidates.compactMap { $0 }.first { !$0.isEmpty } ?? "AniList \(info.id)"

@@ -1,5 +1,5 @@
-import AppKit
 import AVFoundation
+import AppKit
 import SwiftUI
 
 private let maxPreviewImageBytes: Int = 10 * 1024 * 1024
@@ -119,11 +119,16 @@ struct SearchResultRowView: View {
             HStack(alignment: .top, spacing: 10) {
                 ZStack {
                     if isPreviewPlaying {
-                        InlineVideoPreviewView(url: previewURL(result.video, size: settings.previewSize, muteVideo: isMuted), isMuted: isMuted)
-                            .transition(.opacity)
+                        InlineVideoPreviewView(
+                            url: previewURL(result.video, size: settings.previewSize, muteVideo: isMuted),
+                            isMuted: isMuted
+                        )
+                        .transition(.opacity)
                     } else {
-                        CachedPreviewImageView(url: previewURL(result.image, size: settings.previewSize, muteVideo: false))
-                            .transition(.opacity)
+                        CachedPreviewImageView(
+                            url: previewURL(result.image, size: settings.previewSize, muteVideo: false)
+                        )
+                        .transition(.opacity)
                     }
                 }
                 .frame(width: 112, height: 63)
@@ -275,34 +280,34 @@ struct InlineVideoPreviewView: View {
             }
         }
         .background(Color.black.opacity(0.18))
-            .onAppear {
-                downloadTask = Task {
-                    do {
-                        let localURL: URL = try await downloadPreviewVideo(remoteURL: url)
-                        try Task.checkCancellation()
-                        await MainActor.run {
-                            temporaryFileURL = localURL
-                            playPreview(localURL: localURL)
-                        }
-                    } catch {
-                        await MainActor.run {
-                            isReady = false
-                            didFail = true
-                        }
+        .onAppear {
+            downloadTask = Task {
+                do {
+                    let localURL: URL = try await downloadPreviewVideo(remoteURL: url)
+                    try Task.checkCancellation()
+                    await MainActor.run {
+                        temporaryFileURL = localURL
+                        playPreview(localURL: localURL)
+                    }
+                } catch {
+                    await MainActor.run {
+                        isReady = false
+                        didFail = true
                     }
                 }
             }
-            .onDisappear {
-                downloadTask?.cancel()
-                downloadTask = nil
-                observation?.invalidate()
-                observation = nil
-                player?.pause()
-                player = nil
-                removeTemporaryPreview()
-                isReady = false
-                didFail = false
-            }
+        }
+        .onDisappear {
+            downloadTask?.cancel()
+            downloadTask = nil
+            observation?.invalidate()
+            observation = nil
+            player?.pause()
+            player = nil
+            removeTemporaryPreview()
+            isReady = false
+            didFail = false
+        }
     }
 
     private func playPreview(localURL: URL) {
@@ -346,8 +351,9 @@ func downloadPreviewImageData(url: URL) async throws -> Data {
     let payload: (Data, URLResponse) = try await URLSession.shared.data(for: request)
 
     guard let response: HTTPURLResponse = payload.1 as? HTTPURLResponse,
-          (200...299).contains(response.statusCode),
-          payload.0.count <= maxPreviewImageBytes else {
+        (200...299).contains(response.statusCode),
+        payload.0.count <= maxPreviewImageBytes
+    else {
         throw URLError(.cannotDecodeContentData)
     }
 
@@ -359,9 +365,10 @@ func downloadPreviewVideo(remoteURL: URL) async throws -> URL {
     let payload: (Data, URLResponse) = try await URLSession.shared.data(for: request)
 
     guard let response: HTTPURLResponse = payload.1 as? HTTPURLResponse,
-          (200...299).contains(response.statusCode),
-          payload.0.count <= maxPreviewVideoBytes,
-          responseContentType(response: response, contains: "video/mp4") else {
+        (200...299).contains(response.statusCode),
+        payload.0.count <= maxPreviewVideoBytes,
+        responseContentType(response: response, contains: "video/mp4")
+    else {
         throw URLError(.cannotDecodeContentData)
     }
 
@@ -377,7 +384,8 @@ private func makePreviewRequest(url: URL) throws -> URLRequest {
         throw URLError(.unsupportedURL)
     }
 
-    var request: URLRequest = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: previewRequestTimeout)
+    var request: URLRequest = URLRequest(
+        url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: previewRequestTimeout)
     request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
     return request
 }

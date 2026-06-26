@@ -252,7 +252,7 @@ struct MenuBarRootView: View {
                     },
                     toggleFavorite: toggleFavorite(_:)
                 )
-                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
         .animation(.easeInOut(duration: 0.2), value: isSearching)
@@ -440,9 +440,10 @@ struct MenuBarRootView: View {
         }
 
         guard let image: NSImage = object as? NSImage,
-              let tiffData: Data = image.tiffRepresentation,
-              let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData),
-              let data: Data = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.92]) else {
+            let tiffData: Data = image.tiffRepresentation,
+            let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData),
+            let data: Data = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.92])
+        else {
             errorText = localizedErrorText(AppError.unsupportedDrop, language: settings.language)
             return
         }

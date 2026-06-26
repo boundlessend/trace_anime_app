@@ -19,7 +19,8 @@ struct AppSettingsStorage {
         }
 
         if let previewSizeRaw: String = userDefaults.string(forKey: SettingsStorageKey.previewSize.rawValue),
-           let previewSize: PreviewSize = PreviewSize(rawValue: previewSizeRaw) {
+            let previewSize: PreviewSize = PreviewSize(rawValue: previewSizeRaw)
+        {
             settings.previewSize = previewSize
         }
 
@@ -28,7 +29,8 @@ struct AppSettingsStorage {
         }
 
         if let languageRaw: String = userDefaults.string(forKey: SettingsStorageKey.language.rawValue),
-           let language: AppLanguage = AppLanguage(rawValue: languageRaw) {
+            let language: AppLanguage = AppLanguage(rawValue: languageRaw)
+        {
             settings.language = language
         }
 

@@ -74,7 +74,8 @@ struct FavoritesView: View {
                     LazyVStack(spacing: 10) {
                         ForEach(favorites) { item in
                             VStack(alignment: .leading, spacing: 8) {
-                                SearchSourceHeaderView(sourceImage: item.sourceImage, date: item.date, language: language)
+                                SearchSourceHeaderView(
+                                    sourceImage: item.sourceImage, date: item.date, language: language)
 
                                 SearchResultRowView(
                                     result: item.result,
@@ -131,7 +132,8 @@ struct SourceImageThumbnailView: View {
 
             if let sourceImage: SearchImageSnapshot {
                 if let data: Data = sourceImage.data,
-                   let image: NSImage = NSImage(data: data) {
+                    let image: NSImage = NSImage(data: data)
+                {
                     Image(nsImage: image)
                         .resizable()
                         .scaledToFill()

@@ -14,8 +14,9 @@ struct ClipboardImageProvider {
 
     private func payload(from image: NSImage, filename: String) throws -> ImagePayload {
         guard let tiffData: Data = image.tiffRepresentation,
-              let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData),
-              let jpegData: Data = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.92]) else {
+            let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData),
+            let jpegData: Data = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.92])
+        else {
             throw AppError.unsupportedClipboardImage
         }
 

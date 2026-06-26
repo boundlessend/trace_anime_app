@@ -35,7 +35,8 @@ struct TooltipIconButton: NSViewRepresentable {
     }
 
     private func makeImage() -> NSImage? {
-        let configuration: NSImage.SymbolConfiguration = NSImage.SymbolConfiguration(pointSize: fontSize, weight: .regular)
+        let configuration: NSImage.SymbolConfiguration = NSImage.SymbolConfiguration(
+            pointSize: fontSize, weight: .regular)
         return NSImage(systemSymbolName: systemImage, accessibilityDescription: text)?
             .withSymbolConfiguration(configuration)
     }
@@ -167,7 +168,8 @@ final class TooltipButton: NSButton {
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.18
             context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            let transform: CGAffineTransform = isPressed
+            let transform: CGAffineTransform =
+                isPressed
                 ? CGAffineTransform(translationX: 0.0, y: 2.0).scaledBy(x: 1.12, y: 1.12)
                 : .identity
             animator().layer?.setAffineTransform(transform)
