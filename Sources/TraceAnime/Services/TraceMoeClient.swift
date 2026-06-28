@@ -50,8 +50,7 @@ final class TraceMoeClient {
     }
 
     private func searchByImage(payload: ImagePayload, options: SearchOptions) async throws -> TraceMoeSearchResponse {
-        let maxBytes: Int = 25 * 1024 * 1024
-        if payload.data.count > maxBytes {
+        if payload.data.count > traceMoeMaxUploadBytes {
             throw AppError.fileTooLarge(payload.data.count)
         }
 
@@ -109,21 +108,23 @@ final class TraceMoeClient {
     }
 
     private func send(request: URLRequest) async throws -> Data {
-        let tuple: (Data, URLResponse) = try await session.data(for: request)
+        try await retryingNetwork(attempts: 3) {
+            let tuple: (Data, URLResponse) = try await session.data(for: request)
 
-        guard let httpResponse: HTTPURLResponse = tuple.1 as? HTTPURLResponse else {
-            throw TraceMoeAPIError.nonHTTPResponse
+            guard let httpResponse: HTTPURLResponse = tuple.1 as? HTTPURLResponse else {
+                throw TraceMoeAPIError.nonHTTPResponse
+            }
+
+            if (200...299).contains(httpResponse.statusCode) {
+                return tuple.0
+            }
+
+            let apiError: TraceMoeErrorResponse? = try? decoder.decode(TraceMoeErrorResponse.self, from: tuple.0)
+            throw TraceMoeAPIError.http(
+                statusCode: httpResponse.statusCode,
+                message: apiError?.error ?? ""
+            )
         }
-
-        if (200...299).contains(httpResponse.statusCode) {
-            return tuple.0
-        }
-
-        let apiError: TraceMoeErrorResponse? = try? decoder.decode(TraceMoeErrorResponse.self, from: tuple.0)
-        throw TraceMoeAPIError.http(
-            statusCode: httpResponse.statusCode,
-            message: apiError?.error ?? ""
-        )
     }
 }
 

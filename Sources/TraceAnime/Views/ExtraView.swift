@@ -48,7 +48,7 @@ struct ExtraView: View {
             }
 
             if !isCheckingQuota, user == nil, quotaErrorText == nil {
-                Text(t(.checkingQuota, language: language))
+                Text(t(.quotaNotLoaded, language: language))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

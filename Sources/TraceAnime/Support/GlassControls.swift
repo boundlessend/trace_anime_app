@@ -33,11 +33,12 @@ struct TracePressButtonStyle: ButtonStyle {
     }
 }
 
+// ponytail: лёгкое стекло - материал + border с дешёвым hover;
+// убран per-pixel radial/angular shimmer и onContinuousHover (дорого на каждой строке списка)
 struct LiquidGlassSurfaceModifier: ViewModifier {
     let cornerRadius: CGFloat
     let isActive: Bool
 
-    @State private var hoverLocation: CGPoint = .zero
     @State private var isHovering: Bool = false
 
     func body(content: Content) -> some View {
@@ -49,68 +50,41 @@ struct LiquidGlassSurfaceModifier: ViewModifier {
                     .stroke(.white.opacity(isHovering || isActive ? 0.34 : 0.18), lineWidth: 0.7)
                     .allowsHitTesting(false)
             }
-            .overlay {
-                GeometryReader { proxy in
-                    let width: CGFloat = max(proxy.size.width, 1.0)
-                    let height: CGFloat = max(proxy.size.height, 1.0)
-                    let point: UnitPoint = UnitPoint(
-                        x: max(min(hoverLocation.x / width, 1.0), 0.0),
-                        y: max(min(hoverLocation.y / height, 1.0), 0.0)
-                    )
-
-                    ZStack {
-                        RadialGradient(
-                            colors: [
-                                .white.opacity(isActive ? 0.22 : 0.14),
-                                .cyan.opacity(isHovering ? 0.10 : 0.0),
-                                .yellow.opacity(isHovering ? 0.08 : 0.0),
-                                .clear,
-                            ],
-                            center: point,
-                            startRadius: 0.0,
-                            endRadius: max(width, height) * 0.92
-                        )
-
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(
-                                AngularGradient(
-                                    colors: [
-                                        .clear,
-                                        .white.opacity(0.18),
-                                        .cyan.opacity(0.14),
-                                        .yellow.opacity(0.12),
-                                        .clear,
-                                    ],
-                                    center: point
-                                ),
-                                lineWidth: 0.9
-                            )
-                            .opacity(isHovering || isActive ? 1.0 : 0.0)
-                    }
-                    .opacity(isHovering || isActive ? 1.0 : 0.0)
-                    .blendMode(.plusLighter)
-                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-                    .animation(.easeOut(duration: 0.34), value: hoverLocation)
-                    .animation(.easeOut(duration: 0.24), value: isHovering)
-                    .allowsHitTesting(false)
-                }
+            .onHover { hovering in
+                isHovering = hovering
             }
-            .onContinuousHover { phase in
-                switch phase {
-                case .active(let location):
-                    hoverLocation = location
-                    isHovering = true
-                case .ended:
-                    isHovering = false
-                }
-            }
-            .animation(.easeOut(duration: 0.24), value: isHovering)
+            .animation(.easeOut(duration: 0.2), value: isHovering)
     }
 }
 
 extension View {
     func liquidGlass(cornerRadius: CGFloat, isActive: Bool) -> some View {
         modifier(LiquidGlassSurfaceModifier(cornerRadius: cornerRadius, isActive: isActive))
+    }
+}
+
+/// общая отделка сегмента (цвет, подложка выбранного, стекло) для сегментных контролов
+struct GlassSegmentChrome: ViewModifier {
+    let isSelected: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .foregroundStyle(isSelected ? Color.yellow.opacity(0.94) : Color.primary.opacity(0.82))
+            .background {
+                if isSelected {
+                    Capsule()
+                        .fill(.regularMaterial)
+                        .allowsHitTesting(false)
+                }
+            }
+            .liquidGlass(cornerRadius: 20, isActive: isSelected)
+            .contentShape(Capsule())
+    }
+}
+
+extension View {
+    func glassSegmentChrome(isSelected: Bool) -> some View {
+        modifier(GlassSegmentChrome(isSelected: isSelected))
     }
 }
 
@@ -148,18 +122,7 @@ struct GlassSegmentedControl<Value: Hashable>: View {
                         .modifier(GlassSegmentLabelFrame(width: segmentWidth))
                         .padding(.horizontal, 10)
                         .padding(.vertical, 3)
-                        .foregroundStyle(
-                            selection == segment.value ? Color.yellow.opacity(0.94) : Color.primary.opacity(0.82)
-                        )
-                        .background {
-                            if selection == segment.value {
-                                Capsule()
-                                    .fill(.regularMaterial)
-                                    .allowsHitTesting(false)
-                            }
-                        }
-                        .liquidGlass(cornerRadius: 20, isActive: selection == segment.value)
-                        .contentShape(Capsule())
+                        .glassSegmentChrome(isSelected: selection == segment.value)
                         .modifier(GlassSegmentButtonFrame(width: segmentWidth))
                         .transaction { transaction in
                             transaction.animation = nil
@@ -192,20 +155,9 @@ struct StaticGlassTabControl<Value: Hashable>: View {
                         .lineLimit(1)
                         .multilineTextAlignment(.center)
                         .frame(width: segmentWidth, height: 24)
-                        .foregroundStyle(
-                            selection == segment.value ? Color.yellow.opacity(0.94) : Color.primary.opacity(0.82)
-                        )
                         .padding(.horizontal, 10)
                         .padding(.vertical, 3)
-                        .background {
-                            if selection == segment.value {
-                                Capsule()
-                                    .fill(.regularMaterial)
-                                    .allowsHitTesting(false)
-                            }
-                        }
-                        .liquidGlass(cornerRadius: 20, isActive: selection == segment.value)
-                        .contentShape(Capsule())
+                        .glassSegmentChrome(isSelected: selection == segment.value)
                         .frame(width: segmentWidth + 20.0, height: 30)
                         .transaction { transaction in
                             transaction.animation = nil

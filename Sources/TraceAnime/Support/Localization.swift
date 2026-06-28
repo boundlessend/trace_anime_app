@@ -30,7 +30,6 @@ enum L10nKey: String {
     case cutBordersHint
     case launchAtLogin
     case mutePreview
-    case preview
     case previewHint
     case historyHint
     case captureHotKeyHint
@@ -39,6 +38,7 @@ enum L10nKey: String {
     case anilistIDFilter
     case quota
     case checkingQuota
+    case quotaNotLoaded
     case concurrency
     case priority
     case copyright
@@ -129,8 +129,6 @@ private func englishText(_ key: L10nKey) -> String {
         return "Launch at login"
     case .mutePreview:
         return "Mute preview"
-    case .preview:
-        return "Preview quality"
     case .previewHint:
         return "S/M/L changes downloaded preview size and load speed."
     case .historyHint:
@@ -147,6 +145,8 @@ private func englishText(_ key: L10nKey) -> String {
         return "Quota"
     case .checkingQuota:
         return "Checking quota"
+    case .quotaNotLoaded:
+        return "Quota not loaded"
     case .concurrency:
         return "Concurrent requests"
     case .priority:
@@ -244,8 +244,6 @@ private func russianText(_ key: L10nKey) -> String {
         return "Запускать при входе"
     case .mutePreview:
         return "Без звука"
-    case .preview:
-        return "Качество превью"
     case .previewHint:
         return "S/M/L меняет размер загружаемого превью и скорость загрузки."
     case .historyHint:
@@ -262,6 +260,8 @@ private func russianText(_ key: L10nKey) -> String {
         return "Квота"
     case .checkingQuota:
         return "Проверка квоты"
+    case .quotaNotLoaded:
+        return "Квота не загружена"
     case .concurrency:
         return "Одновременные запросы"
     case .priority:
@@ -359,8 +359,6 @@ private func frenchText(_ key: L10nKey) -> String {
         return "Lancer à la connexion"
     case .mutePreview:
         return "Aperçu muet"
-    case .preview:
-        return "Qualité de l'aperçu"
     case .previewHint:
         return "S/M/L change la taille téléchargée et la vitesse de chargement."
     case .historyHint:
@@ -377,6 +375,8 @@ private func frenchText(_ key: L10nKey) -> String {
         return "Quota"
     case .checkingQuota:
         return "Vérification du quota"
+    case .quotaNotLoaded:
+        return "Quota non chargé"
     case .concurrency:
         return "Requêtes simultanées"
     case .priority:

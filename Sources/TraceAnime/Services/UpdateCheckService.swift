@@ -47,17 +47,21 @@ final class UpdateCheckService {
             url: releasesURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
 
-        let payload: (Data, URLResponse) = try await session.data(for: request)
+        let data: Data = try await retryingNetwork(attempts: 3) {
+            let payload: (Data, URLResponse) = try await session.data(for: request)
 
-        guard let response: HTTPURLResponse = payload.1 as? HTTPURLResponse else {
-            throw UpdateCheckError.nonHTTPResponse
+            guard let response: HTTPURLResponse = payload.1 as? HTTPURLResponse else {
+                throw UpdateCheckError.nonHTTPResponse
+            }
+
+            guard (200...299).contains(response.statusCode) else {
+                throw UpdateCheckError.http(statusCode: response.statusCode)
+            }
+
+            return payload.0
         }
 
-        guard (200...299).contains(response.statusCode) else {
-            throw UpdateCheckError.http(statusCode: response.statusCode)
-        }
-
-        let release: GitHubRelease = try decoder.decode(GitHubRelease.self, from: payload.0)
+        let release: GitHubRelease = try decoder.decode(GitHubRelease.self, from: data)
         let latestVersion: String = normalizedVersion(release.tagName)
 
         guard isVersion(latestVersion, newerThan: currentVersion) else {

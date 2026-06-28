@@ -22,6 +22,7 @@ struct MenuBarRootView: View {
     @State private var history: [SearchHistoryEntry] = []
     @State private var favorites: [FavoriteResult] = []
     @State private var quotaCheckTask: Task<Void, Never>?
+    @State private var saveTask: Task<Void, Never>?
 
     private let client: TraceMoeClient
     private let clipboardProvider: ClipboardImageProvider
@@ -92,6 +93,8 @@ struct MenuBarRootView: View {
                 systemImage: "power.circle.fill",
                 fontSize: 17
             ) {
+                saveTask?.cancel()
+                flushAPIKey(settings.apiKey)
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")
@@ -182,6 +185,7 @@ struct MenuBarRootView: View {
                 if previousSettings.apiKey != nextSettings.apiKey {
                     quotaNeedsRefresh = true
                     user = nil
+                    scheduleAPIKeySave(nextSettings.apiKey)
                 }
 
                 if previousSettings.historyLimit != nextSettings.historyLimit {
@@ -191,6 +195,10 @@ struct MenuBarRootView: View {
                 if previousSettings.captureHotKey != nextSettings.captureHotKey {
                     NotificationCenter.default.post(name: .captureHotKeyChanged, object: nil)
                 }
+            }
+            .onDisappear {
+                saveTask?.cancel()
+                flushAPIKey(settings.apiKey)
             }
             .onChange(of: history) { _, nextHistory in
                 saveHistory(nextHistory)
@@ -297,9 +305,25 @@ struct MenuBarRootView: View {
     }
 
     private func saveSettings(_ nextSettings: AppSettings) {
+        settingsStorage.savePreferences(settings: nextSettings)
+    }
+
+    /// откладывает запись токена в Keychain, чтобы не писать на каждое нажатие клавиши
+    private func scheduleAPIKeySave(_ apiKey: String) {
+        saveTask?.cancel()
+        saveTask = Task {
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            if Task.isCancelled {
+                return
+            }
+
+            flushAPIKey(apiKey)
+        }
+    }
+
+    private func flushAPIKey(_ apiKey: String) {
         do {
-            try settingsStorage.save(settings: nextSettings)
-            errorText = nil
+            try settingsStorage.saveAPIKey(apiKey)
         } catch {
             errorText = localizedErrorText(error, language: settings.language)
         }
@@ -481,7 +505,7 @@ struct MenuBarRootView: View {
         }
 
         guard let image: NSImage = object as? NSImage,
-            let data: Data = jpegRepresentation(from: image, compressionFactor: 0.92)
+            let data: Data = jpegRepresentation(from: image, compressionFactor: searchImageJPEGCompression)
         else {
             errorText = localizedErrorText(AppError.unsupportedDrop, language: settings.language)
             return

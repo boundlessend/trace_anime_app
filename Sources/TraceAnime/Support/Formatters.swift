@@ -84,18 +84,13 @@ func trimmedNumber(_ value: Double) -> String {
     return String(format: "%.2f", value)
 }
 
-func previewURL(_ url: URL, size: PreviewSize, muteVideo: Bool) -> URL {
+func previewURL(_ url: URL, size: PreviewSize) -> URL {
     guard var components: URLComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
         return url
     }
 
     var queryItems: [URLQueryItem] = components.queryItems ?? []
     queryItems.append(URLQueryItem(name: "size", value: size.rawValue))
-
-    if muteVideo {
-        queryItems.append(URLQueryItem(name: "mute", value: nil))
-    }
-
     components.queryItems = queryItems
     return components.url ?? url
 }

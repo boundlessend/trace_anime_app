@@ -120,23 +120,23 @@ struct SearchResultRowView: View {
                 ZStack {
                     if isPreviewPlaying {
                         InlineVideoPreviewView(
-                            url: previewURL(result.video, size: settings.previewSize, muteVideo: isMuted),
+                            url: previewURL(result.video, size: settings.previewSize),
                             isMuted: isMuted
                         )
                         .transition(.opacity)
                     } else {
                         CachedPreviewImageView(
-                            url: previewURL(result.image, size: settings.previewSize, muteVideo: false)
+                            url: previewURL(result.image, size: settings.previewSize)
                         )
                         .transition(.opacity)
                     }
                 }
                 .frame(width: 112, height: 63)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
-                .id(previewURL(result.image, size: settings.previewSize, muteVideo: false))
+                .id(previewURL(result.image, size: settings.previewSize))
                 .onDrag {
                     NSItemProvider(
-                        object: previewURL(result.image, size: settings.previewSize, muteVideo: false) as NSURL)
+                        object: previewURL(result.image, size: settings.previewSize) as NSURL)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -275,10 +275,18 @@ struct CachedPreviewImageView: View {
             image = loadedImage
             isLoading = false
         } catch {
+            if !isPreviewCancellation(error) {
+                AppLog.preview.error("image preview failed: \(error.localizedDescription, privacy: .public)")
+            }
             image = nil
             isLoading = false
         }
     }
+}
+
+/// отличает штатную отмену загрузки превью (при закрытии строки) от настоящей ошибки
+func isPreviewCancellation(_ error: Error) -> Bool {
+    error is CancellationError || (error as? URLError)?.code == .cancelled
 }
 
 struct InlineVideoPreviewView: View {
@@ -322,6 +330,9 @@ struct InlineVideoPreviewView: View {
                         playPreview(localURL: localURL)
                     }
                 } catch {
+                    if !isPreviewCancellation(error) {
+                        AppLog.preview.error("video preview failed: \(error.localizedDescription, privacy: .public)")
+                    }
                     await MainActor.run {
                         isReady = false
                         didFail = true
@@ -339,6 +350,9 @@ struct InlineVideoPreviewView: View {
             removeTemporaryPreview()
             isReady = false
             didFail = false
+        }
+        .onChange(of: isMuted) { _, nextMuted in
+            player?.isMuted = nextMuted
         }
     }
 
@@ -378,15 +392,40 @@ struct InlineVideoPreviewView: View {
     }
 }
 
+enum PreviewDownloadError: LocalizedError, Equatable {
+    case nonHTTPResponse
+    case http(statusCode: Int)
+    case tooLarge(bytes: Int)
+    case unexpectedContentType(String?)
+
+    var errorDescription: String? {
+        switch self {
+        case .nonHTTPResponse:
+            return "preview download returned a non-HTTP response"
+        case .http(let statusCode):
+            return "preview download HTTP \(statusCode)"
+        case .tooLarge(let bytes):
+            return "preview exceeds size limit: \(bytes) bytes"
+        case .unexpectedContentType(let value):
+            return "unexpected preview content type: \(value ?? "none")"
+        }
+    }
+}
+
 func downloadPreviewImageData(url: URL) async throws -> Data {
     let request: URLRequest = try makePreviewRequest(url: url)
     let payload: (Data, URLResponse) = try await URLSession.shared.data(for: request)
 
-    guard let response: HTTPURLResponse = payload.1 as? HTTPURLResponse,
-        (200...299).contains(response.statusCode),
-        payload.0.count <= maxPreviewImageBytes
-    else {
-        throw URLError(.cannotDecodeContentData)
+    guard let response: HTTPURLResponse = payload.1 as? HTTPURLResponse else {
+        throw PreviewDownloadError.nonHTTPResponse
+    }
+
+    guard (200...299).contains(response.statusCode) else {
+        throw PreviewDownloadError.http(statusCode: response.statusCode)
+    }
+
+    guard payload.0.count <= maxPreviewImageBytes else {
+        throw PreviewDownloadError.tooLarge(bytes: payload.0.count)
     }
 
     return payload.0
@@ -396,12 +435,20 @@ func downloadPreviewVideo(remoteURL: URL) async throws -> URL {
     let request: URLRequest = try makePreviewRequest(url: remoteURL)
     let payload: (Data, URLResponse) = try await URLSession.shared.data(for: request)
 
-    guard let response: HTTPURLResponse = payload.1 as? HTTPURLResponse,
-        (200...299).contains(response.statusCode),
-        payload.0.count <= maxPreviewVideoBytes,
-        responseContentType(response: response, contains: "video/mp4")
-    else {
-        throw URLError(.cannotDecodeContentData)
+    guard let response: HTTPURLResponse = payload.1 as? HTTPURLResponse else {
+        throw PreviewDownloadError.nonHTTPResponse
+    }
+
+    guard (200...299).contains(response.statusCode) else {
+        throw PreviewDownloadError.http(statusCode: response.statusCode)
+    }
+
+    guard payload.0.count <= maxPreviewVideoBytes else {
+        throw PreviewDownloadError.tooLarge(bytes: payload.0.count)
+    }
+
+    guard responseContentType(response: response, contains: "video/mp4") else {
+        throw PreviewDownloadError.unexpectedContentType(response.value(forHTTPHeaderField: "Content-Type"))
     }
 
     let fileURL: URL = FileManager.default.temporaryDirectory

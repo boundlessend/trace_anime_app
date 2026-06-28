@@ -16,6 +16,7 @@ final class ScreenCaptureService {
         do {
             try process.run()
         } catch {
+            AppLog.capture.error("screencapture launch failed: \(error.localizedDescription, privacy: .public)")
             return false
         }
 

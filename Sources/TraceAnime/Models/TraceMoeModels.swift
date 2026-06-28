@@ -19,9 +19,9 @@ struct TraceMoeUser: Decodable, Equatable {
         let container: KeyedDecodingContainer<CodingKeys> = try decoder.container(keyedBy: CodingKeys.self)
 
         self.id = try container.decode(String.self, forKey: .id)
-        self.priority = try container.decode(Int.self, forKey: .priority)
-        self.concurrency = try container.decode(Int.self, forKey: .concurrency)
-        self.quota = try container.decode(Int.self, forKey: .quota)
+        self.priority = try decodeIntOrString(container: container, key: .priority)
+        self.concurrency = try decodeIntOrString(container: container, key: .concurrency)
+        self.quota = try decodeIntOrString(container: container, key: .quota)
         self.quotaUsed = try decodeIntOrString(container: container, key: .quotaUsed)
     }
 }

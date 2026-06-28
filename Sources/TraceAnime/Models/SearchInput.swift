@@ -11,6 +11,9 @@ struct ImagePayload: Equatable {
     let filename: String
 }
 
+/// лимит trace.moe на размер загружаемого файла
+let traceMoeMaxUploadBytes: Int = 25 * 1024 * 1024
+
 struct SearchOptions: Equatable {
     let cutBorders: Bool
     let anilistID: Int?

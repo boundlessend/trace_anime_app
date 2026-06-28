@@ -185,18 +185,27 @@ struct SourceImageThumbnailView: View {
     }
 }
 
-func displayDate(_ date: Date) -> String {
+// ponytail: общие форматтеры вместо аллокации на каждый вызов; используются только из MainActor (UI)
+private let shortDateFormatter: DateFormatter = {
     let formatter: DateFormatter = DateFormatter()
     formatter.dateStyle = .short
     formatter.timeStyle = .short
-    return formatter.string(from: date)
+    return formatter
+}()
+
+private let longDateFormatter: DateFormatter = {
+    let formatter: DateFormatter = DateFormatter()
+    formatter.dateFormat = "d MMMM, yyyy, HH:mm"
+    return formatter
+}()
+
+func displayDate(_ date: Date) -> String {
+    shortDateFormatter.string(from: date)
 }
 
 func displayLongDate(_ date: Date, language: AppLanguage) -> String {
-    let formatter: DateFormatter = DateFormatter()
-    formatter.locale = locale(language: language)
-    formatter.dateFormat = "d MMMM, yyyy, HH:mm"
-    return formatter.string(from: date)
+    longDateFormatter.locale = locale(language: language)
+    return longDateFormatter.string(from: date)
 }
 
 func displaySource(sourceImage: SearchImageSnapshot, language: AppLanguage) -> String {

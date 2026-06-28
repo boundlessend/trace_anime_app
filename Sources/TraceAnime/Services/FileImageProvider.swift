@@ -3,7 +3,7 @@ import Foundation
 import UniformTypeIdentifiers
 
 struct FileImageProvider {
-    private let maxUploadBytes: Int = 25 * 1024 * 1024
+    private let maxUploadBytes: Int = traceMoeMaxUploadBytes
 
     /// открывает системный выбор изображения или видео для поиска
     func pickImageFile() throws -> URL? {

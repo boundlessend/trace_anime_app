@@ -57,14 +57,19 @@ struct AppSettingsStorage {
         return settings
     }
 
-    func save(settings: AppSettings) throws {
-        try keychain.write(settings.apiKey)
+    /// сохраняет дешёвые настройки в UserDefaults; вызывается часто (в т.ч. на каждое нажатие клавиши)
+    func savePreferences(settings: AppSettings) {
         userDefaults.set(settings.cutBorders, forKey: SettingsStorageKey.cutBorders.rawValue)
         userDefaults.set(settings.previewSize.rawValue, forKey: SettingsStorageKey.previewSize.rawValue)
         userDefaults.set(settings.anilistIDText, forKey: SettingsStorageKey.anilistIDText.rawValue)
         userDefaults.set(settings.language.rawValue, forKey: SettingsStorageKey.language.rawValue)
         userDefaults.set(settings.historyLimit.rawValue, forKey: SettingsStorageKey.historyLimit.rawValue)
         userDefaults.set(settings.captureHotKey.rawValue, forKey: SettingsStorageKey.captureHotKey.rawValue)
+    }
+
+    /// пишет токен в Keychain; вызывается с дебаунсом, а не на каждое нажатие
+    func saveAPIKey(_ apiKey: String) throws {
+        try keychain.write(apiKey)
     }
 }
 
