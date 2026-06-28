@@ -26,10 +26,7 @@ struct FileImageProvider {
     func imagePayload(fileURL: URL) throws -> ImagePayload {
         try validateReadableMediaFile(fileURL: fileURL, maxBytes: maxUploadBytes)
 
-        guard let data: Data = try? Data(contentsOf: fileURL) else {
-            throw AppError.fileReadFailed(fileURL)
-        }
-
+        let data: Data = try Data(contentsOf: fileURL)
         let contentType: String = contentTypeForFile(fileURL: fileURL)
         return ImagePayload(data: data, contentType: contentType, filename: fileURL.lastPathComponent)
     }

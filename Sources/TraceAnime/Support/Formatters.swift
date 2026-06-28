@@ -62,7 +62,7 @@ func displayEpisode(_ episode: EpisodeReference?, language: AppLanguage) -> Stri
 }
 
 func displayTimestamp(_ seconds: Double?) -> String {
-    guard let seconds: Double else {
+    guard let seconds: Double, seconds.isFinite, seconds >= 0, seconds < Double(Int.max) else {
         return "00:00"
     }
 

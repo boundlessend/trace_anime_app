@@ -2,15 +2,23 @@ import Foundation
 
 struct AppSettingsStorage {
     private let userDefaults: UserDefaults
+    private let keychain: KeychainStorage
 
     init(userDefaults: UserDefaults) {
         self.userDefaults = userDefaults
+        self.keychain = KeychainStorage(service: "com.senya.TraceAnime", account: "trace.moe.apiKey")
     }
 
     func load() throws -> AppSettings {
         var settings: AppSettings = defaultAppSettings()
 
-        if let apiKey: String = userDefaults.string(forKey: SettingsStorageKey.apiKey.rawValue) {
+        // миграция: раньше ключ лежал в UserDefaults открытым текстом, переносим в Keychain
+        if let legacyKey: String = userDefaults.string(forKey: SettingsStorageKey.apiKey.rawValue) {
+            try keychain.write(legacyKey)
+            userDefaults.removeObject(forKey: SettingsStorageKey.apiKey.rawValue)
+        }
+
+        if let apiKey: String = try keychain.read() {
             settings.apiKey = apiKey
         }
 
@@ -50,7 +58,7 @@ struct AppSettingsStorage {
     }
 
     func save(settings: AppSettings) throws {
-        userDefaults.set(settings.apiKey, forKey: SettingsStorageKey.apiKey.rawValue)
+        try keychain.write(settings.apiKey)
         userDefaults.set(settings.cutBorders, forKey: SettingsStorageKey.cutBorders.rawValue)
         userDefaults.set(settings.previewSize.rawValue, forKey: SettingsStorageKey.previewSize.rawValue)
         userDefaults.set(settings.anilistIDText, forKey: SettingsStorageKey.anilistIDText.rawValue)

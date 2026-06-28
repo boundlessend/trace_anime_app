@@ -237,7 +237,6 @@ struct CachedPreviewImageView: View {
 
     @State private var image: NSImage?
     @State private var isLoading: Bool = false
-    @State private var didFail: Bool = false
 
     var body: some View {
         ZStack {
@@ -247,9 +246,6 @@ struct CachedPreviewImageView: View {
                     .scaledToFill()
             } else if isLoading {
                 ProgressView()
-            } else if didFail {
-                Image(systemName: "photo")
-                    .foregroundStyle(.secondary)
             } else {
                 Image(systemName: "photo")
                     .foregroundStyle(.secondary)
@@ -261,15 +257,13 @@ struct CachedPreviewImageView: View {
     }
 
     private func loadImage() async {
-        if let cachedImage: NSImage = await PreviewImageCache.shared.image(url: url) {
+        if let cachedImage: NSImage = PreviewImageCache.shared.image(url: url) {
             image = cachedImage
             isLoading = false
-            didFail = false
             return
         }
 
         isLoading = true
-        didFail = false
 
         do {
             let data: Data = try await downloadPreviewImageData(url: url)
@@ -277,14 +271,12 @@ struct CachedPreviewImageView: View {
                 throw URLError(.cannotDecodeContentData)
             }
 
-            await PreviewImageCache.shared.store(data: data, url: url)
+            PreviewImageCache.shared.store(data: data, url: url)
             image = loadedImage
             isLoading = false
-            didFail = false
         } catch {
             image = nil
             isLoading = false
-            didFail = true
         }
     }
 }

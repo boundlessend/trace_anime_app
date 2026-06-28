@@ -54,9 +54,9 @@ private func localizedAPIError(_ error: TraceMoeAPIError, language: AppLanguage)
             return "Impossible de créer la requête API: \(context)"
         case .nonHTTPResponse:
             return "trace.moe a renvoyé une réponse non HTTP."
-        case .http(let statusCode, let body, let message, let url):
+        case .http(let statusCode, let message):
             let visibleMessage: String = message.isEmpty ? "sans message" : message
-            return "trace.moe HTTP \(statusCode): \(visibleMessage). URL: \(url). Body: \(body)"
+            return "trace.moe HTTP \(statusCode): \(visibleMessage)."
         }
     }
 }
@@ -90,8 +90,8 @@ private func englishAPIError(_ error: TraceMoeAPIError) -> String {
         return "Could not build API request: \(context)"
     case .nonHTTPResponse:
         return "trace.moe returned a non-HTTP response."
-    case .http(let statusCode, let body, let message, let url):
+    case .http(let statusCode, let message):
         let visibleMessage: String = message.isEmpty ? "no message" : message
-        return "trace.moe HTTP \(statusCode): \(visibleMessage). URL: \(url). Body: \(body)"
+        return "trace.moe HTTP \(statusCode): \(visibleMessage)."
     }
 }

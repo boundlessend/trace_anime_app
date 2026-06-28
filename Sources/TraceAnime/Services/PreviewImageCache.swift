@@ -2,47 +2,33 @@ import AppKit
 import Foundation
 
 /// хранит загруженные превью, чтобы они не мигали при возврате во вкладку поиска
-actor PreviewImageCache {
+final class PreviewImageCache {
     static let shared: PreviewImageCache = PreviewImageCache()
 
-    private let maxEntries: Int = 80
-    private var images: [URL: Data] = [:]
-    private var urls: [URL] = []
+    private let cache: NSCache<NSURL, NSData> = {
+        let cache: NSCache<NSURL, NSData> = NSCache()
+        cache.countLimit = 80
+        return cache
+    }()
 
     func image(url: URL) -> NSImage? {
-        guard let data: Data = images[url] else {
+        guard let data: NSData = cache.object(forKey: url as NSURL) else {
             return nil
         }
 
-        return NSImage(data: data)
+        return NSImage(data: data as Data)
     }
 
     func store(data: Data, url: URL) {
-        if images[url] == nil {
-            urls.append(url)
-        }
-
-        images[url] = data
-        trim()
+        cache.setObject(data as NSData, forKey: url as NSURL)
     }
 
     func clear() {
-        images.removeAll()
-        urls.removeAll()
+        cache.removeAllObjects()
         URLCache.shared.removeAllCachedResponses()
-    }
-
-    /// ограничивает память, занятую превью из результатов поиска
-    private func trim() {
-        while urls.count > maxEntries {
-            let removedURL: URL = urls.removeFirst()
-            images.removeValue(forKey: removedURL)
-        }
     }
 }
 
 func clearPreviewImageCache() {
-    Task {
-        await PreviewImageCache.shared.clear()
-    }
+    PreviewImageCache.shared.clear()
 }

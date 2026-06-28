@@ -28,8 +28,8 @@ final class TraceMoeClient {
         var request: URLRequest = makeAPIRequest(url: url)
         applyAPIKey(apiKey: apiKey, request: &request)
 
-        let response: HTTPPayload = try await send(request: request)
-        return try decoder.decode(TraceMoeUser.self, from: response.data)
+        let data: Data = try await send(request: request)
+        return try decoder.decode(TraceMoeUser.self, from: data)
     }
 
     private func searchByURL(imageURL: URL, options: SearchOptions) async throws -> TraceMoeSearchResponse {
@@ -45,8 +45,8 @@ final class TraceMoeClient {
         var request: URLRequest = makeAPIRequest(url: url)
         applyAPIKey(apiKey: options.apiKey, request: &request)
 
-        let response: HTTPPayload = try await send(request: request)
-        return try decoder.decode(TraceMoeSearchResponse.self, from: response.data)
+        let data: Data = try await send(request: request)
+        return try decoder.decode(TraceMoeSearchResponse.self, from: data)
     }
 
     private func searchByImage(payload: ImagePayload, options: SearchOptions) async throws -> TraceMoeSearchResponse {
@@ -67,8 +67,8 @@ final class TraceMoeClient {
         request.setValue(payload.contentType, forHTTPHeaderField: "Content-Type")
         applyAPIKey(apiKey: options.apiKey, request: &request)
 
-        let response: HTTPPayload = try await send(request: request)
-        return try decoder.decode(TraceMoeSearchResponse.self, from: response.data)
+        let data: Data = try await send(request: request)
+        return try decoder.decode(TraceMoeSearchResponse.self, from: data)
     }
 
     private func makeSearchComponents(options: SearchOptions) throws -> URLComponents {
@@ -108,7 +108,7 @@ final class TraceMoeClient {
         return request
     }
 
-    private func send(request: URLRequest) async throws -> HTTPPayload {
+    private func send(request: URLRequest) async throws -> Data {
         let tuple: (Data, URLResponse) = try await session.data(for: request)
 
         guard let httpResponse: HTTPURLResponse = tuple.1 as? HTTPURLResponse else {
@@ -116,27 +116,21 @@ final class TraceMoeClient {
         }
 
         if (200...299).contains(httpResponse.statusCode) {
-            return HTTPPayload(data: tuple.0)
+            return tuple.0
         }
 
         let apiError: TraceMoeErrorResponse? = try? decoder.decode(TraceMoeErrorResponse.self, from: tuple.0)
         throw TraceMoeAPIError.http(
             statusCode: httpResponse.statusCode,
-            body: String(data: tuple.0, encoding: .utf8) ?? "",
-            message: apiError?.error ?? "",
-            url: request.url?.absoluteString ?? ""
+            message: apiError?.error ?? ""
         )
     }
-}
-
-struct HTTPPayload {
-    let data: Data
 }
 
 enum TraceMoeAPIError: LocalizedError, Equatable {
     case requestBuildFailed(String)
     case nonHTTPResponse
-    case http(statusCode: Int, body: String, message: String, url: String)
+    case http(statusCode: Int, message: String)
 
     var errorDescription: String? {
         switch self {
@@ -144,9 +138,9 @@ enum TraceMoeAPIError: LocalizedError, Equatable {
             return "Не удалось собрать API request: \(context)"
         case .nonHTTPResponse:
             return "trace.moe вернул не-HTTP response."
-        case .http(let statusCode, let body, let message, let url):
+        case .http(let statusCode, let message):
             let visibleMessage: String = message.isEmpty ? "без сообщения" : message
-            return "trace.moe HTTP \(statusCode): \(visibleMessage). URL: \(url). Body: \(body)"
+            return "trace.moe HTTP \(statusCode): \(visibleMessage)."
         }
     }
 }

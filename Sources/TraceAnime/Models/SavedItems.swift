@@ -10,7 +10,6 @@ enum SearchImageSourceKind: String, Codable {
 struct SearchImageSnapshot: Codable, Equatable {
     let data: Data?
     let url: URL?
-    let contentType: String?
     let filename: String
     let sourceKind: SearchImageSourceKind?
 }

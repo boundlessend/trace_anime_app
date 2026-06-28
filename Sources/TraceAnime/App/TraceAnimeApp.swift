@@ -6,6 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let popover: NSPopover = NSPopover()
     private let screenCaptureService: ScreenCaptureService = ScreenCaptureService()
     private var hotKeyService: HotKeyService?
+    private var hotKeyObserver: NSObjectProtocol?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApplication.shared.setActivationPolicy(.accessory)
@@ -69,12 +70,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         hotKeyService = service
         applyHotKeySetting()
 
-        NotificationCenter.default.addObserver(
+        hotKeyObserver = NotificationCenter.default.addObserver(
             forName: .captureHotKeyChanged,
             object: nil,
             queue: .main
         ) { [weak self] _ in
             self?.applyHotKeySetting()
+        }
+    }
+
+    deinit {
+        if let hotKeyObserver: NSObjectProtocol = hotKeyObserver {
+            NotificationCenter.default.removeObserver(hotKeyObserver)
         }
     }
 

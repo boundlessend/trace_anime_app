@@ -21,9 +21,9 @@ struct MenuBarRootView: View {
     @State private var previousMainTab: RootTab = .search
     @State private var history: [SearchHistoryEntry] = []
     @State private var favorites: [FavoriteResult] = []
+    @State private var quotaCheckTask: Task<Void, Never>?
 
     private let client: TraceMoeClient
-    private let queue: SearchQueue
     private let clipboardProvider: ClipboardImageProvider
     private let fileProvider: FileImageProvider
     private let settingsStorage: AppSettingsStorage
@@ -38,7 +38,6 @@ struct MenuBarRootView: View {
             decoder: decoder
         )
         self.client = client
-        self.queue = SearchQueue(client: client)
         self.clipboardProvider = ClipboardImageProvider()
         self.fileProvider = FileImageProvider()
         self.settingsStorage = AppSettingsStorage(userDefaults: .standard)
@@ -373,7 +372,8 @@ struct MenuBarRootView: View {
 
         quotaErrorText = nil
 
-        Task {
+        quotaCheckTask?.cancel()
+        quotaCheckTask = Task {
             isCheckingQuota = true
             defer {
                 isCheckingQuota = false
@@ -385,6 +385,10 @@ struct MenuBarRootView: View {
                 quotaErrorText = nil
                 errorText = nil
             } catch {
+                if Task.isCancelled {
+                    return
+                }
+
                 quotaErrorText = localizedErrorText(error, language: settings.language)
             }
         }
@@ -477,9 +481,7 @@ struct MenuBarRootView: View {
         }
 
         guard let image: NSImage = object as? NSImage,
-            let tiffData: Data = image.tiffRepresentation,
-            let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData),
-            let data: Data = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.92])
+            let data: Data = jpegRepresentation(from: image, compressionFactor: 0.92)
         else {
             errorText = localizedErrorText(AppError.unsupportedDrop, language: settings.language)
             return
@@ -496,7 +498,7 @@ struct MenuBarRootView: View {
     private func runSearch(input: SearchInput, title: String) async throws {
         let options: SearchOptions = try makeSearchOptions(settings: settings)
         let sourceImage: SearchImageSnapshot? = makeSearchImageSnapshot(input: input)
-        await PreviewImageCache.shared.clear()
+        PreviewImageCache.shared.clear()
         isSearching = true
         searchResponse = nil
         currentSearchImage = nil
@@ -505,13 +507,16 @@ struct MenuBarRootView: View {
             isSearching = false
         }
 
-        let response: TraceMoeSearchResponse = try await queue.search(input: input, options: options)
+        let response: TraceMoeSearchResponse = try await client.search(input: input, options: options)
         quotaNeedsRefresh = true
         withAnimation(.easeInOut(duration: 0.22)) {
             searchResponse = response
             currentSearchImage = sourceImage
         }
-        addHistory(title: title, response: response, sourceImage: sourceImage)
+
+        if !response.result.isEmpty {
+            addHistory(title: title, response: response, sourceImage: sourceImage)
+        }
     }
 }
 

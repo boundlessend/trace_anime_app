@@ -13,13 +13,21 @@ struct ClipboardImageProvider {
     }
 
     private func payload(from image: NSImage, filename: String) throws -> ImagePayload {
-        guard let tiffData: Data = image.tiffRepresentation,
-            let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData),
-            let jpegData: Data = bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.92])
-        else {
+        guard let data: Data = jpegRepresentation(from: image, compressionFactor: 0.92) else {
             throw AppError.unsupportedClipboardImage
         }
 
-        return ImagePayload(data: jpegData, contentType: "image/jpeg", filename: filename)
+        return ImagePayload(data: data, contentType: "image/jpeg", filename: filename)
     }
+}
+
+/// кодирует NSImage в JPEG для отправки в trace.moe и сохранения превью
+func jpegRepresentation(from image: NSImage, compressionFactor: Double) -> Data? {
+    guard let tiffData: Data = image.tiffRepresentation,
+        let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData)
+    else {
+        return nil
+    }
+
+    return bitmap.representation(using: .jpeg, properties: [.compressionFactor: compressionFactor])
 }

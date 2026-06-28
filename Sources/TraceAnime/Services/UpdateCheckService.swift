@@ -64,6 +64,11 @@ final class UpdateCheckService {
             return nil
         }
 
+        // не доверяем произвольному html_url из ответа: открываем только страницу релиза на github.com
+        guard release.htmlURL.host == "github.com" else {
+            return nil
+        }
+
         return AppRelease(version: latestVersion, url: release.htmlURL)
     }
 }

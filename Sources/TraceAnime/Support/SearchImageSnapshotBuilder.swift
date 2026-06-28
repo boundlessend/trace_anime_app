@@ -6,7 +6,7 @@ func makeSearchImageSnapshot(input: SearchInput) -> SearchImageSnapshot? {
     switch input {
     case .imageURL(let url):
         return SearchImageSnapshot(
-            data: nil, url: url, contentType: nil, filename: url.absoluteString, sourceKind: .url)
+            data: nil, url: url, filename: url.absoluteString, sourceKind: .url)
     case .imageData(let payload):
         guard let thumbnailData: Data = makeJPEGThumbnailData(data: payload.data, maxDimension: 180.0) else {
             return nil
@@ -15,7 +15,6 @@ func makeSearchImageSnapshot(input: SearchInput) -> SearchImageSnapshot? {
         return SearchImageSnapshot(
             data: thumbnailData,
             url: nil,
-            contentType: "image/jpeg",
             filename: payload.filename,
             sourceKind: searchImageSourceKind(filename: payload.filename)
         )
@@ -57,11 +56,5 @@ func makeJPEGThumbnailData(data: Data, maxDimension: CGFloat) -> Data? {
     )
     thumbnail.unlockFocus()
 
-    guard let tiffData: Data = thumbnail.tiffRepresentation,
-        let bitmap: NSBitmapImageRep = NSBitmapImageRep(data: tiffData)
-    else {
-        return nil
-    }
-
-    return bitmap.representation(using: .jpeg, properties: [.compressionFactor: 0.82])
+    return jpegRepresentation(from: thumbnail, compressionFactor: 0.82)
 }
